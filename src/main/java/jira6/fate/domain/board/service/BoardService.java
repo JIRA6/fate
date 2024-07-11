@@ -58,4 +58,12 @@ public class BoardService {
             .map(BoardResponseDto::new)
             .collect(Collectors.toList());
     }
+
+    public BoardResponseDto getBoardId(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+            ()-> new CustomException(ErrorCode.BOARD_NOT_FOUND)
+        );
+
+        return new BoardResponseDto(board);
+    }
 }

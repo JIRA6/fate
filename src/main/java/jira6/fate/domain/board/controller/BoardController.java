@@ -58,4 +58,12 @@ public class BoardController {
             boardList);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/{boardId}")
+    public ResponseEntity<DataResponse<BoardResponseDto>> getBoardId(@PathVariable Long boardId) {
+        BoardResponseDto responseDto = boardService.getBoardId(boardId);
+        DataResponse<BoardResponseDto> response = new DataResponse<>(200, "보드 조회 성공",
+            responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
