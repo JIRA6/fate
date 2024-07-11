@@ -7,10 +7,10 @@ public class CustomException extends RuntimeException{
 	private ErrorCode errorCode;
 
 	public CustomException(ErrorCode errorCode){
-		super(errorCode.getMsg());
+		super(errorCode.getMessage());
 		this.errorCode = errorCode;
 		log.info("ExceptionMethod: {}", getExceptionMethod());
-		log.info("ErrorCode: {}", errorCode.getMsg());
+		log.info("ErrorCode: {}", errorCode.getMessage());
 	}
 	public String getExceptionMethod(){
 		String className = Thread.currentThread().getStackTrace()[3].getClassName();

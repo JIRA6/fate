@@ -16,56 +16,39 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
-	protected ResponseEntity<ExceptionResponse> defaultException(HttpServletRequest request, Exception e){
+	protected ResponseEntity<ExceptionResponse> defaultException(Exception e){
 		e.printStackTrace();
 		ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-			.msg(ErrorCode.FAIL.getMsg())
-			.path(request.getRequestURI())
-			.build();
+				.statusCode(ErrorCode.FAIL.getStatus())
+				.message(ErrorCode.FAIL.getMessage())
+				.build();
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(CustomException.class)
-	public ResponseEntity<ExceptionResponse> handleInvalidPasswordException(HttpServletRequest request, CustomException e) {
+	public ResponseEntity<ExceptionResponse> handleInvalidPasswordException(CustomException e) {
 		ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-			.msg(e.getErrorCode().getMsg())
-			.path(request.getRequestURI())
-			.build();
+				.statusCode(e.getErrorCode().getStatus())
+				.message(e.getErrorCode().getMessage())
+				.build();
 		return new ResponseEntity<>(exceptionResponse, HttpStatusCode.valueOf(e.getErrorCode().getStatus()));
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
-	public ResponseEntity<ExceptionResponse> handleAccessDeniedException(HttpServletRequest request, AccessDeniedException e) {
+	public ResponseEntity<ExceptionResponse> handleAccessDeniedException(AccessDeniedException e) {
 		ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-			.msg(ErrorCode.UNAUTHORIZED_ADMIN.getMsg())
-			.path(request.getRequestURI())
-			.build();
+				.statusCode(ErrorCode.UNAUTHORIZED_MANAGER.getStatus())
+				.message(ErrorCode.UNAUTHORIZED_MANAGER.getMessage())
+				.build();
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ExceptionResponse> processValidationError(HttpServletRequest request, MethodArgumentNotValidException exception) {
-		BindingResult bindingResult = exception.getBindingResult();
-		StringBuilder builder = new StringBuilder();
-		String msg = ErrorCode.FAIL.getMsg();
-
-		FieldError fieldError = bindingResult.getFieldErrors().get(0);
-		String fieldName = fieldError.getField();
-
-		builder.append("[");
-		builder.append(fieldName);
-		builder.append("](은)는 ");
-		builder.append(fieldError.getDefaultMessage());
-		builder.append(" / 입력된 값: [");
-		builder.append(fieldError.getRejectedValue());
-		builder.append("]");
-
-		return new ResponseEntity<>(
-			ExceptionResponse.builder()
-				.msg(builder.toString())
-				.path(request.getRequestURI())
-				.build(),
-			HttpStatus.BAD_REQUEST
-		);
+	public ResponseEntity<ExceptionResponse> processValidationError(MethodArgumentNotValidException e) {
+		ExceptionResponse exceptionResponse = ExceptionResponse.builder()
+				.statusCode(ErrorCode.INVALID_REQUEST.getStatus())
+				.message(ErrorCode.INVALID_REQUEST.getMessage())
+				.build();
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
 }
