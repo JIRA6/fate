@@ -25,8 +25,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		response.getWriter().write(new ObjectMapper().writeValueAsString(
 			ExceptionResponse.builder()
-				.msg(ErrorCode.UNAUTHORIZED_ADMIN.getMsg())
-				.path(request.getRequestURI())
+				.message(ErrorCode.UNAUTHORIZED_MANAGER.getMessage())
 				.build()
 		));
 		response.getWriter().flush();
