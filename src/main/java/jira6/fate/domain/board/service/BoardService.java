@@ -1,5 +1,7 @@
 package jira6.fate.domain.board.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import jira6.fate.domain.board.dto.BoardRequestDto;
 import jira6.fate.domain.board.dto.BoardResponseDto;
 import jira6.fate.domain.board.entity.Board;
@@ -16,7 +18,6 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     public BoardResponseDto createBoard(BoardRequestDto boardRequestDto) {
-
         if (boardRequestDto.getTitle() == null || boardRequestDto.getTitle().isEmpty()
             || boardRequestDto.getIntro() == null || boardRequestDto.getIntro().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
@@ -33,7 +34,6 @@ public class BoardService {
     }
 
     public BoardResponseDto updateBoard(Long boardId, BoardRequestDto boardRequestDto) {
-
         Board board = boardRepository.findById(boardId).orElseThrow(
             () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
         );
@@ -44,13 +44,18 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
-
     public void deleteBoard(Long boardId) {
-
         Board board = boardRepository.findById(boardId).orElseThrow(
             () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
         );
 
         boardRepository.delete(board);
+    }
+
+    public List<BoardResponseDto> getAllBoard() {
+        List<Board> boards = boardRepository.findAll();
+        return boards.stream()
+            .map(BoardResponseDto::new)
+            .collect(Collectors.toList());
     }
 }
