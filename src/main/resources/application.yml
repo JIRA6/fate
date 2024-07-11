@@ -19,3 +19,9 @@ spring:
 
 manager:
   password: ${MANAGER_PASSWORD}
+
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  expiration:
+    access_token: ${JWT_ACCESS_TOKEN_EXPIRATION}
+    refresh_token: ${JWT_REFRESH_TOKEN_EXPIRATION}
