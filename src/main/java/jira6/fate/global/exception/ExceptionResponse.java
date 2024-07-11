@@ -8,6 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class ExceptionResponse {
-	String msg;
-	String path;
+	Integer statusCode;
+	String message;
 }
