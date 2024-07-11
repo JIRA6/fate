@@ -13,7 +13,7 @@ public enum ErrorCode {
 	INCORRECT_PASSWORD(400, "입력하신 비밀번호가 일치하지 않습니다."),
 	INCORRECT_MANAGER_KEY(400, "입력하신 MANAGER키가 일치하지 않습니다."),
 	USER_NOT_FOUND(400, "해당하는 유저를 찾을 수 없습니다."),
-	USER_NOT_UNIQUE(400,"중복된 사용자가 존재합니다."),
+	USER_NOT_UNIQUE(409,"사용 중인 아이디입니다."),
 	USER_NOT_TEAM(404, "해당 유저가 팀에 없습니다."),
 	BOARD_NOT_FOUND(404, "해당 보드를 찾을 수 없습니다."),
 	COLUMN_NOT_FOUND(404, "해당 컬럼을 찾을 수 없습니다."),
