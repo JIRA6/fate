@@ -37,3 +37,6 @@ out/
 .vscode/
 
 application-secrets.yml
+.gitignore!/build.gradle
+!/.gitignore
+src/main/java/jira6/fate/domain/global/config/SwaggerConfig.java
