@@ -21,6 +21,7 @@ public class BoardService {
             || boardRequestDto.getIntro() == null || boardRequestDto.getIntro().isEmpty()){
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
+
             Board board = Board.builder()
                 .title(boardRequestDto.getTitle())
                 .intro(boardRequestDto.getIntro())
