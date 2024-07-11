@@ -1,11 +1,13 @@
 package jira6.fate.global.jwt;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Base64;
@@ -23,6 +25,8 @@ public class JwtProvider {
     @Value("${jwt.expiration.refresh_token}")
     private Long refreshTokenExpiration;
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     private Key key;
 
@@ -44,6 +48,29 @@ public class JwtProvider {
         return generateToken(username, role, expirationDate);
     }
 
+    public String getAccessTokenFromHeader(HttpServletRequest request) {
+
+        String authorization = request.getHeader(AUTHORIZATION_HEADER);
+
+        if (!StringUtils.hasText(authorization) || !authorization.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+
+        return substringBearer(authorization);
+    }
+
+    public void addAccessTokenHeader(HttpServletResponse response, String accessToken) {
+        response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
+    }
+
+    public Claims getClaimsFromToken(String token) throws ExpiredJwtException, JwtException {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     private String generateToken(String username, String role, Date expirationDate) {
         return Jwts.builder()
                 .setSubject(username)
@@ -52,13 +79,16 @@ public class JwtProvider {
                 .setIssuedAt(new Date())
                 .signWith(key, signatureAlgorithm)
                 .compact();
-
     }
 
     private Date createExpirationDate(Long ms) {
         Date date = new Date();
 
         return new Date(date.getTime() + ms);
+    }
+
+    private String substringBearer(String authorization) {
+        return authorization.substring(7);
     }
 
 }
