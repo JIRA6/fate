@@ -18,6 +18,7 @@ public class BoardResponseDto {
 
     @Builder
     public BoardResponseDto(Board board) {
+        this.id = board.getId();
         this.title = board.getTitle();
         this.intro = board.getIntro();
         this.createdAt = board.getCreatedAt();
