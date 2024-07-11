@@ -19,7 +19,7 @@ public class BoardService {
 
         if (boardRequestDto.getTitle() == null || boardRequestDto.getTitle().isEmpty()
             || boardRequestDto.getIntro() == null || boardRequestDto.getIntro().isEmpty()){
-            throw new CustomException(ErrorCode.)
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
             Board board = Board.builder()
                 .title(boardRequestDto.getTitle())
