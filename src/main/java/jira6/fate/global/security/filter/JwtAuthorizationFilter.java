@@ -7,8 +7,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jira6.fate.global.exception.ErrorCode;
 import jira6.fate.global.jwt.JwtProvider;
 import jira6.fate.global.security.UserDetailsServiceImpl;
+import jira6.fate.global.security.dto.SecurityErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,7 +34,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String accessToken = jwtProvider.getAccessTokenFromHeader(request);
 
         if (StringUtils.hasText(accessToken)) {
-            tokenValidation(accessToken);
+
+            boolean isValidToken = tokenValidation(response, accessToken);
+
+            if (!isValidToken) {
+                return;
+            }
+
         }
 
         filterChain.doFilter(request, response);
@@ -49,14 +57,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     }
 
-    private void tokenValidation(String token) {
+    private boolean tokenValidation(HttpServletResponse response, String token) throws IOException {
         try {
             Claims userInfo = jwtProvider.getClaimsFromToken(token);
             setAuthentication(userInfo.getSubject());
+
+            return true;
         } catch (ExpiredJwtException e) {
+            SecurityErrorResponse securityErrorResponse = new SecurityErrorResponse();
+            securityErrorResponse.sendResponse(response, ErrorCode.TOKEN_EXPIRED);
 
+            return false;
         } catch (JwtException e) {
+            SecurityErrorResponse securityErrorResponse = new SecurityErrorResponse();
+            securityErrorResponse.sendResponse(response, ErrorCode.INVALID_TOKEN);
 
+            return false;
         }
     }
 
