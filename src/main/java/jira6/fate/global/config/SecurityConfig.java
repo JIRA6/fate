@@ -3,8 +3,6 @@ package jira6.fate.global.config;
 import jira6.fate.domain.user.repository.UserRepository;
 import jira6.fate.global.jwt.JwtProvider;
 import jira6.fate.global.security.UserDetailsServiceImpl;
-import jira6.fate.global.security.exception.CustomAccessDeniedHandler;
-import jira6.fate.global.security.exception.CustomAuthenticationEntryPoint;
 import jira6.fate.global.security.filter.JwtAuthenticationFilter;
 import jira6.fate.global.security.filter.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,8 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+        throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -66,7 +65,6 @@ public class SecurityConfig {
                 })
                 .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
