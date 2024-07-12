@@ -1,35 +1,30 @@
 package jira6.fate.domain.column.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import jira6.fate.domain.board.entity.Board;
-import jira6.fate.domain.board.BoardRepository;
-import jira6.fate.domain.user.entity.User;
-import jira6.fate.domain.user.repository.UserRepository;
-import jira6.fate.domain.column.entity.Columns;
-import jira6.fate.domain.column.repository.ColumnRepository;
+import jira6.fate.domain.board.repository.BoardRepository;
+import jira6.fate.domain.column.dto.ColumnOrderDto;
 import jira6.fate.domain.column.dto.ColumnRequestDto;
 import jira6.fate.domain.column.dto.ColumnResponseDto;
+import jira6.fate.domain.column.entity.Columns;
+import jira6.fate.domain.column.repository.ColumnRepository;
+import jira6.fate.domain.user.entity.User;
+import jira6.fate.domain.user.entity.UserRole;
+import jira6.fate.domain.user.repository.UserRepository;
 import jira6.fate.global.exception.CustomException;
 import jira6.fate.global.exception.ErrorCode;
-import jira6.fate.domain.user.entity.UserRole;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ColumnService {
 
   private final ColumnRepository columnRepository;
   private final BoardRepository boardRepository;
   private final UserRepository userRepository;
-
-  @Autowired
-  public ColumnService(ColumnRepository columnRepository, BoardRepository boardRepository, UserRepository userRepository) {
-    this.columnRepository = columnRepository;
-    this.boardRepository = boardRepository;
-    this.userRepository = userRepository;
-  }
 
   public ColumnResponseDto createColumn(ColumnRequestDto columnRequestDto, String username) {
     User user = userRepository.findByUserName(username)
@@ -37,27 +32,26 @@ public class ColumnService {
     Board board = boardRepository.findById(columnRequestDto.getBoardId())
         .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-    // 권한 확인
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
     if (columnRepository.existsByNameAndBoardId(columnRequestDto.getColumnName(), columnRequestDto.getBoardId())) {
-      throw new CustomException(ErrorCode.COLUMN_NOT_UNIQUE);
+      throw new CustomException(ErrorCode.USER_NOT_UNIQUE);
     }
 
-    Columns column = new Columns();
-    column.setColumnName(columnRequestDto.getColumnName());
-    column.setColumnOrder(columnRequestDto.getColumnOrder());
-    column.setBoard(board);
+    Columns column = Columns.builder()
+        .columnName(columnRequestDto.getColumnName())
+        .columnOrder(0L) // 기본 순서
+        .board(board)
+        .build();
     Columns savedColumn = columnRepository.save(column);
 
-    ColumnResponseDto responseDto = new ColumnResponseDto();
-    responseDto.setId(savedColumn.getId());
-    responseDto.setColumnName(savedColumn.getColumnName());
-    responseDto.setBoardId(savedColumn.getBoard().getId());
-
-    return responseDto;
+    return ColumnResponseDto.builder()
+        .id(savedColumn.getId())
+        .columnName(savedColumn.getColumnName())
+        .boardId(savedColumn.getBoard().getId())
+        .build();
   }
 
   public ColumnResponseDto updateColumn(Long columnId, ColumnRequestDto columnRequestDto, String username) {
@@ -67,21 +61,18 @@ public class ColumnService {
         .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
     Board board = column.getBoard();
 
-    // 권한 확인
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
-    column.setColumnName(columnRequestDto.getColumnName());
-    column.setColumnOrder(columnRequestDto.getColumnOrder());
+    column.updateColumnName(columnRequestDto.getColumnName());
     Columns updatedColumn = columnRepository.save(column);
 
-    ColumnResponseDto responseDto = new ColumnResponseDto();
-    responseDto.setId(updatedColumn.getId());
-    responseDto.setColumnName(updatedColumn.getColumnName());
-    responseDto.setBoardId(updatedColumn.getBoard().getId());
-
-    return responseDto;
+    return ColumnResponseDto.builder()
+        .id(updatedColumn.getId())
+        .columnName(updatedColumn.getColumnName())
+        .boardId(updatedColumn.getBoard().getId())
+        .build();
   }
 
   public void deleteColumn(Long columnId, String username) {
@@ -91,7 +82,6 @@ public class ColumnService {
         .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
     Board board = column.getBoard();
 
-    // 권한 확인
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
@@ -105,25 +95,39 @@ public class ColumnService {
     Board board = boardRepository.findById(boardId)
         .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-    // 권한 확인
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
     List<Columns> columns = columnRepository.findByBoardId(boardId);
     return columns.stream()
-        .map(column -> {
-          ColumnResponseDto dto = new ColumnResponseDto();
-          dto.setId(column.getId());
-          dto.setColumnName(column.getColumnName());
-          dto.setBoardId(column.getBoard().getId());
-          return dto;
-        })
+        .map(column -> ColumnResponseDto.builder()
+            .id(column.getId())
+            .columnName(column.getColumnName())
+            .boardId(column.getBoard().getId())
+            .build())
         .collect(Collectors.toList());
   }
 
+  public void updateColumnOrder(Long boardId, List<ColumnOrderDto> columnOrderDtos, String username) {
+    User user = userRepository.findByUserName(username)
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    Board board = boardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+    if (!hasAccessToBoard(user, board)) {
+      throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+    }
+
+    columnOrderDtos.forEach(columnOrderDto -> {
+      Columns column = columnRepository.findById(columnOrderDto.getColumnId())
+          .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
+      column.updateColumnOrder(columnOrderDto.getColumnOrder());
+      columnRepository.save(column);
+    });
+  }
+
   private boolean hasAccessToBoard(User user, Board board) {
-    // 사용자 역할 확인
     return user.getUserRole() == UserRole.MANAGER;
   }
 }

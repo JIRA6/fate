@@ -1,22 +1,23 @@
 package jira6.fate.domain.column.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import jira6.fate.domain.column.dto.ColumnOrderDto;
 import jira6.fate.domain.column.dto.ColumnRequestDto;
 import jira6.fate.domain.column.dto.ColumnResponseDto;
 import jira6.fate.domain.column.service.ColumnService;
 import jira6.fate.global.exception.CustomException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/boards/{boardId}/columns")
+@RequiredArgsConstructor
 public class ColumnController {
 
-  @Autowired
-  private ColumnService columnService;
+  private final ColumnService columnService;
 
   @PostMapping
   public ResponseEntity<?> createColumn(@RequestBody ColumnRequestDto columnRequestDto, @PathVariable Long boardId, Principal principal) {
@@ -56,6 +57,16 @@ public class ColumnController {
       return ResponseEntity.ok(columns);
     } catch (CustomException e) {
       return ResponseEntity.status(e.getErrorCode().getStatus()).body(null);
+    }
+  }
+
+  @PostMapping("/{columnId}/order")
+  public ResponseEntity<?> updateColumnOrder(@PathVariable Long boardId, @PathVariable Long columnId, @RequestBody List<ColumnOrderDto> columnOrderDtos, Principal principal) {
+    try {
+      columnService.updateColumnOrder(boardId, columnOrderDtos, principal.getName());
+      return ResponseEntity.ok().body("컬럼 순서 이동 성공");
+    } catch (CustomException e) {
+      return ResponseEntity.status(e.getErrorCode().getStatus()).body(e.getErrorCode().getMessage());
     }
   }
 }
