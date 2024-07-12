@@ -48,6 +48,14 @@ public class UserService {
 
     }
 
+    @Transactional
+    public void logout(Long id) {
+
+        User user = userRepository.findById(id).orElseThrow( () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.updateRefreshToken(null);
+
+    }
+
     private void checkPassword(String inputPassword, String password) {
         if (!passwordEncoder.matches(inputPassword, password)) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
