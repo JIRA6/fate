@@ -28,8 +28,9 @@ public class CardController {
     /**
      * 카드 생성 ( 인가 필요 )
      *
-     * @param columnId   : 컬럼 아이디
-     * @param requestDto : 생성할 카드의 정보
+     * @param columnId    : 컬럼 아이디
+     * @param requestDto  : 생성할 카드의 정보
+     * @param userDetails : 카드를 생성하려는 사용자의 정보
      * @return : 카드 생성 성공 상태 코드 및 메시지 반환
      */
     @PostMapping("/columns/{columnId}/cards")
@@ -46,18 +47,20 @@ public class CardController {
     /**
      * 카드 수정 ( 인가 필요 )
      *
-     * @param columnId   : 컬럼 아이디
-     * @param cardId     : 카드 아이디
-     * @param requestDto : 수정할 카드의 정보
+     * @param columnId    : 컬럼 아이디
+     * @param cardId      : 카드 아이디
+     * @param requestDto  : 수정할 카드의 정보
+     * @param userDetails : 카드를 수정하려는 사용자의 정보
      * @return : 카드 수정 성공 상태 코드 및 메시지 반환
      */
     @PutMapping("/columns/{columnId}/cards/{cardId}")
     public ResponseEntity<MessageResponse> updateCard(
         @Min(1) @PathVariable Long columnId,
         @Valid @Min(1) @PathVariable Long cardId,
-        @RequestBody CardUpdateRequestDto requestDto
+        @RequestBody CardUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        cardService.updateCard(columnId, cardId, requestDto);
+        cardService.updateCard(columnId, cardId, requestDto, userDetails.getUser());
         MessageResponse response = new MessageResponse(200, "카드 수정 성공");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

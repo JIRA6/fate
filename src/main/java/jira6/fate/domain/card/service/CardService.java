@@ -39,9 +39,16 @@ public class CardService {
     }
 
     @Transactional
-    public void updateCard(Long columnId, Long cardId, CardUpdateRequestDto requestDto) {
+    public void updateCard(Long columnId, Long cardId, CardUpdateRequestDto requestDto, User user) {
         Columns column = findColumn(columnId);
         Card card = findCard(cardId);
+
+        String cardCreatorName = card.getUser().getUserName();
+        String currentUserName = user.getUserName();
+
+        if (!checkCardCreator(cardCreatorName, currentUserName)) {
+            throw new CustomException(ErrorCode.NOT_UNAUTHORIZED);
+        }
 
         card.update(
             requestDto.getCardTitle(),
@@ -54,7 +61,7 @@ public class CardService {
 
     public Columns findColumn(Long columnId) {
         return columnRepository.findById(columnId).orElseThrow(
-            () -> new CustomException(COLUMN_NOT_FOUND)
+            () -> new CustomException(ErrorCode.COLUMN_NOT_FOUND)
         );
     }
 
@@ -62,5 +69,9 @@ public class CardService {
         return cardRepository.findById(cardId).orElseThrow(
             () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
         );
+    }
+
+    public Boolean checkCardCreator(String managerName, String userName) {
+        return managerName.equals(userName);
     }
 }
