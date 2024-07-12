@@ -30,9 +30,9 @@ public class BoardController {
     public ResponseEntity<DataResponse<BoardResponseDto>> createBoard(@Valid @RequestBody
     BoardRequestDto boardRequestDto) {
         BoardResponseDto responseDto = boardService.createBoard(boardRequestDto);
-        DataResponse<BoardResponseDto> response = new DataResponse<>(200, "보드 생성 성공",
+        DataResponse<BoardResponseDto> response = new DataResponse<>(201, "보드 생성 성공",
             responseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{boardId}")

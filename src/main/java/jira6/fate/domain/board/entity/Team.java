@@ -11,8 +11,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "table_team")
