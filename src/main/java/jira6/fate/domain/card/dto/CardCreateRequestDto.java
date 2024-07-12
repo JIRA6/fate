@@ -1,6 +1,7 @@
 package jira6.fate.domain.card.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
@@ -15,8 +16,8 @@ public class CardCreateRequestDto {
     @NotBlank
     private Long cardOrder;
 
-    private String managerName;
+    private LocalDate deadlineAt;
 
-    private LocalDateTime deadlineAt;
+    private Long teamId;
 
 }

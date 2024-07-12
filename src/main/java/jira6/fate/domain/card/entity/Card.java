@@ -12,13 +12,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Columns;
 
 @Entity
 @Table(name = "table_card")
@@ -40,39 +39,40 @@ public class Card extends Timestamped {
     private Long cardOrder;
 
     @Column
-    private String managerName;
-
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime deadlineAt;
+    @Temporal(TemporalType.DATE)
+    private LocalDate deadlineAt;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "column_id", nullable = false)
-    private Columns column;
+    private Columns columns;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
     @Builder
-    public Card(String cardTitle, String cardContents, Long cardOrder, String managerName,
-        LocalDateTime deadlineAt, Columns column, User user) {
+    public Card(String cardTitle, String cardContents, Long cardOrder,
+        LocalDate deadlineAt, Columns columns, User user, Team team) {
         this.cardTitle = cardTitle;
         this.cardContents = cardContents;
         this.cardOrder = cardOrder;
-        this.managerName = managerName;
         this.deadlineAt = deadlineAt;
-        this.column = column;
+        this.columns = columns;
         this.user = user;
+        this.team = team;
     }
 
-    public void update(String cardTitle, String cardContents, String managerName,
-        LocalDateTime deadlineAt, Columns column) {
+    public void update(String cardTitle, String cardContents,
+        LocalDate deadlineAt, Columns columns, Team team) {
         this.cardTitle = cardTitle;
         this.cardContents = cardContents;
-        this.managerName = managerName;
         this.deadlineAt = deadlineAt;
-        this.column = column;
+        this.columns = columns;
+        this.team = team;
     }
 
 }

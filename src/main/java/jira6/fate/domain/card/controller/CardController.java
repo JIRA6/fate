@@ -3,8 +3,10 @@ package jira6.fate.domain.card.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
+import jira6.fate.domain.card.dto.CardDetailResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.service.CardService;
+import jira6.fate.global.dto.DataResponse;
 import jira6.fate.global.dto.MessageResponse;
 import jira6.fate.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,6 +46,23 @@ public class CardController {
         cardService.createCard(columnId, requestDto, userDetails.getUser());
         MessageResponse response = new MessageResponse(201, "카드 생성 성공");
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    /**
+     * 카드 조회 ( 인가 필요 )
+     *
+     * @param columnId    : 컬럼 아이디
+     * @param cardId : 카드 아이디
+     * @return : 카드 상세 조회 성공 상태 코드 및 메시지 반환
+     */
+    @GetMapping("/columns/{columnId}/cards/{cardId}")
+    public ResponseEntity<DataResponse<CardDetailResponseDto>> getCard(
+        @Min(1) @PathVariable Long columnId,
+        @Min(1) @PathVariable Long cardId
+    ) {
+        CardDetailResponseDto responseDto = cardService.getCard(columnId, cardId);
+        DataResponse<CardDetailResponseDto> response = new DataResponse<CardDetailResponseDto>(200, "카드 상세 조회 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
