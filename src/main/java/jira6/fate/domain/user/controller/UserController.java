@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -42,6 +39,19 @@ public class UserController {
         MessageResponse response = MessageResponse.builder()
                 .statusCode(200)
                 .message("로그아웃 성공")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/users/withdrawal")
+    public ResponseEntity<MessageResponse> withdrawal(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        userService.withdrawal(userDetails.getUser().getId());
+
+        MessageResponse response = MessageResponse.builder()
+                .statusCode(200)
+                .message("회원탈퇴 성공")
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
