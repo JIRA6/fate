@@ -2,10 +2,9 @@ package jira6.fate.domain.card.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Min.List;
+import java.util.List;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
-import jira6.fate.domain.card.dto.CardListResponseDto;
 import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.service.CardService;
