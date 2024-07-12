@@ -71,7 +71,7 @@ public class CardService {
         );
     }
 
-    public Boolean checkCardCreator(String managerName, String userName) {
-        return managerName.equals(userName);
+    public Boolean checkCardCreator(String cardCreatorName, String currentUserName) {
+        return cardCreatorName.equals(currentUserName);
     }
 }
