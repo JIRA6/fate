@@ -59,6 +59,14 @@ public class CardService {
         );
     }
 
+    @Transactional
+    public void deleteCard(Long columnId, Long cardId, User user) {
+        findColumn(columnId);
+        Card card = findCard(cardId);
+
+        cardRepository.delete(card);
+    }
+
     public Columns findColumn(Long columnId) {
         return columnRepository.findById(columnId).orElseThrow(
             () -> new CustomException(ErrorCode.COLUMN_NOT_FOUND)
@@ -74,4 +82,5 @@ public class CardService {
     public Boolean checkCardCreator(String cardCreatorName, String currentUserName) {
         return cardCreatorName.equals(currentUserName);
     }
+
 }
