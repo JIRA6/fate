@@ -38,10 +38,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         if (!request.getMethod().equals("POST")) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setContentType("application/json;charset=UTF-8");
+
+            SecurityErrorResponse securityErrorResponse = new SecurityErrorResponse();
+
             try {
-                response.getWriter().write("잘못된 url 접근입니다.");
+                securityErrorResponse.sendResponse(response, ErrorCode.INVALID_URL_ACCESS);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -73,6 +74,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             SecurityErrorResponse securityErrorResponse = new SecurityErrorResponse();
             securityErrorResponse.sendResponse(response, ErrorCode.CHECK_USERNAME_PASSWORD);
 
+            return;
         }
 
         String accessToken = jwtProvider.generateAccessToken(username, userRole);
