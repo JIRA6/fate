@@ -53,6 +53,23 @@ public class CardController {
     }
 
     /**
+     * 카드 전체 조회 ( 인가 필요 )
+     *
+     * @param boardId : 보드 아이디
+     * @return : 카드 전체 조회 성공 상태 코드 및 메시지 반환
+     */
+    @GetMapping("/boards/{boardId}/cards")
+    public ResponseEntity<DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>> getAllCard(
+        @Min(1) @PathVariable Long boardId
+    ) {
+        List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCard(
+            boardId);
+        DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>(
+            200, "카드 컬렴럼 조회 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
      * 카드 조회 ( 인가 필요 )
      *
      * @param columnId : 컬럼 아이디
@@ -93,11 +110,11 @@ public class CardController {
      * @return : 카드 작업자별 조회 성공 상태 코드 및 메시지 반환
      */
     @GetMapping("/cards/teams/{teamId}")
-    public ResponseEntity<DataResponse<List<CardListResponseDto<CardResponseDto>>>> getAllCardByTeam(
+    public ResponseEntity<DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>> getAllCardByTeam(
         @Min(1) @PathVariable Long teamId
     ) {
-        List<CardListResponseDto<CardResponseDto>> responseDto = cardService.getAllCardByTeam(teamId);
-        DataResponse<List<CardListResponseDto<CardResponseDto>>> response = new DataResponse<>(
+        List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCardByTeam(teamId);
+        DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<>(
             200, "카드 작업자별 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

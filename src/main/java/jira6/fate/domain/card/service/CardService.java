@@ -3,7 +3,11 @@ package jira6.fate.domain.card.service;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import jira6.fate.domain.board.entity.Board;
 import jira6.fate.domain.board.entity.Team;
+import jira6.fate.domain.board.repository.BoardRepository;
+import jira6.fate.domain.board.repository.TeamRepository;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
 import jira6.fate.domain.card.dto.CardListResponseDto;
@@ -24,8 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CardService {
 
-    private final CardRepository cardRepository;
+    private final BoardRepository boardRepository;
     private final ColumnRepository columnRepository;
+    private final CardRepository cardRepository;
     private final TeamRepository teamRepository;
 
     @Transactional
@@ -99,6 +104,12 @@ public class CardService {
         cardRepository.delete(card);
     }
 
+    public Board findBoard(Long boardId) {
+        return boardRepository.findById(boardId).orElseThrow(
+            () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
+        );
+    }
+
     public Columns findColumn(Long columnId) {
         return columnRepository.findById(columnId).orElseThrow(
             () -> new CustomException(ErrorCode.COLUMN_NOT_FOUND)
@@ -130,7 +141,7 @@ public class CardService {
     }
 
     @Transactional(readOnly = true)
-    public List<CardListResponseDto<CardResponseDto>> getAllCardByTeam(Long teamId) {
+    public List<CardListResponseDto<List<CardResponseDto>>> getAllCardByTeam(Long teamId) {
         findTeam(teamId);
 
         List<Card> cards = cardRepository.findByTeamId(teamId);
@@ -151,10 +162,41 @@ public class CardService {
 
         return groupedByColumns.entrySet()
             .stream()
-            .map(entry -> CardListResponseDto.<CardResponseDto>builder()
+            .map(entry -> CardListResponseDto.<List<CardResponseDto>>builder()
                 .columnId(entry.getKey().getId())
                 .columnName(entry.getKey().getColumnName())
                 .cardData(entry.getValue())
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CardListResponseDto<List<CardResponseDto>>> getAllCard(Long boardId) {
+        findBoard(boardId);
+
+        List<Card> cards = StreamSupport.stream(cardRepository.findAll().spliterator(), false).toList();
+
+        // 그룹화하여 컬럼별로 카드 목록을 나눔
+        Map<Columns, List<CardResponseDto>> groupedByColumns = cards.stream()
+            .collect(Collectors.groupingBy(
+                Card::getColumn,
+                Collectors.mapping(
+                    card -> CardResponseDto.builder()
+                        .cardId(card.getId())
+                        .cardTitle(card.getCardTitle())
+                        .deadlineAt(card.getDeadlineAt())
+                        .build(),
+                    Collectors.toList()
+                )
+            ));
+
+        // 올바른 타입으로 매핑
+        return groupedByColumns.entrySet()
+            .stream()
+            .map(entry -> CardListResponseDto.<List<CardResponseDto>>builder()
+                .columnId(entry.getKey().getId())
+                .columnName(entry.getKey().getColumnName())
+                .cardData(entry.getValue()) // 여기가 중요합니다.
                 .build())
             .collect(Collectors.toList());
     }
