@@ -78,5 +78,8 @@ public class Card extends Timestamped {
         this.team = team;
     }
 
+    public void updateCardOrder(Long cardOrder) {
+        this.cardOrder = cardOrder;
+    }
 }
 

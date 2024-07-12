@@ -11,6 +11,8 @@ import jira6.fate.domain.board.repository.TeamRepository;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
 import jira6.fate.domain.card.dto.CardListResponseDto;
+import jira6.fate.domain.card.dto.CardOrderListRequestDto;
+import jira6.fate.domain.card.dto.CardOrderRequestDto;
 import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.entity.Card;
@@ -146,6 +148,19 @@ public class CardService {
 
         List<Card> cards = cardRepository.findByTeamId(teamId);
 
+        return groupAndMapToResponse(cards);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CardListResponseDto<List<CardResponseDto>>> getAllCard(Long boardId) {
+        findBoard(boardId);
+
+        List<Card> cards = StreamSupport.stream(cardRepository.findAll().spliterator(), false).toList();
+
+        return groupAndMapToResponse(cards);
+    }
+
+    private List<CardListResponseDto<List<CardResponseDto>>> groupAndMapToResponse(List<Card> cards) {
         // 그룹화하여 컬럼별로 카드 목록을 나눔
         Map<Columns, List<CardResponseDto>> groupedByColumns = cards.stream()
             .collect(Collectors.groupingBy(
@@ -153,6 +168,7 @@ public class CardService {
                 Collectors.mapping(
                     card -> CardResponseDto.builder()
                         .cardId(card.getId())
+                        .cardOrder(card.getCardOrder())
                         .cardTitle(card.getCardTitle())
                         .deadlineAt(card.getDeadlineAt())
                         .build(),
@@ -170,34 +186,23 @@ public class CardService {
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public List<CardListResponseDto<List<CardResponseDto>>> getAllCard(Long boardId) {
-        findBoard(boardId);
+    @Transactional
+    public void updateCardOrder(Long columnId, CardOrderListRequestDto requestDto) {
+        findColumn(columnId);
 
-        List<Card> cards = StreamSupport.stream(cardRepository.findAll().spliterator(), false).toList();
+        List<CardOrderRequestDto> cardOrders = requestDto.getOrderData();
 
-        // 그룹화하여 컬럼별로 카드 목록을 나눔
-        Map<Columns, List<CardResponseDto>> groupedByColumns = cards.stream()
-            .collect(Collectors.groupingBy(
-                Card::getColumn,
-                Collectors.mapping(
-                    card -> CardResponseDto.builder()
-                        .cardId(card.getId())
-                        .cardTitle(card.getCardTitle())
-                        .deadlineAt(card.getDeadlineAt())
-                        .build(),
-                    Collectors.toList()
-                )
-            ));
+        for (CardOrderRequestDto cardOrder : cardOrders) {
+            Long cardId = cardOrder.getCardId();
+            Long order = cardOrder.getCardOrder();
 
-        // 올바른 타입으로 매핑
-        return groupedByColumns.entrySet()
-            .stream()
-            .map(entry -> CardListResponseDto.<List<CardResponseDto>>builder()
-                .columnId(entry.getKey().getId())
-                .columnName(entry.getKey().getColumnName())
-                .cardData(entry.getValue()) // 여기가 중요합니다.
-                .build())
-            .collect(Collectors.toList());
+            Card card = cardRepository.findById(cardId).orElseThrow(
+                () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
+            );
+
+            card.updateCardOrder(order);
+
+            cardRepository.save(card); // 순서 업데이트 저장
+        }
     }
 }
