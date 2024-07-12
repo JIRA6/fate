@@ -38,10 +38,11 @@ public class Board extends Timestamped {
     private User user;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-    private List<Column> columns;
+    private List<Columns> columns;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Team> teams;
+
 
     @Builder
     public Board(String title, String intro) {
