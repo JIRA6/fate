@@ -2,9 +2,11 @@ package jira6.fate.global.config;
 
 import jira6.fate.domain.user.repository.UserRepository;
 import jira6.fate.global.jwt.JwtProvider;
+import jira6.fate.global.security.UserDetailsServiceImpl;
+import jira6.fate.global.security.exception.CustomAccessDeniedHandler;
+import jira6.fate.global.security.exception.CustomAuthenticationEntryPoint;
 import jira6.fate.global.security.filter.JwtAuthenticationFilter;
 import jira6.fate.global.security.filter.JwtAuthorizationFilter;
-import jira6.fate.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +29,8 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsServiceImpl userDetailsService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -56,6 +60,10 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/api/users/signup").permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling( (exceptionHandling) -> {
+                    exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint);
+                    exceptionHandling.accessDeniedHandler(customAccessDeniedHandler);
+                })
                 .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
