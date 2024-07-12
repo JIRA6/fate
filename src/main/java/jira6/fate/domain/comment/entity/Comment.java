@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jira6.fate.domain.board.entity.Board;
 import jira6.fate.domain.card.entity.Card;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
@@ -39,6 +38,13 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
+
+    @Builder
+    public Comment(String commentContents, User user, Card card) {
+        this.commentContents = commentContents;
+        this.user = user;
+        this.card = card;
+    }
 
 }
 
