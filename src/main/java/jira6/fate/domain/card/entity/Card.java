@@ -50,33 +50,29 @@ public class Card extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "team_id")
-//    private Team team;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @Builder
-//    public Card(String cardTitle, String cardContents, Long cardOrder,
-//        LocalDate deadlineAt, Columns columns, User user, Team team) {
     public Card(String cardTitle, String cardContents, Long cardOrder,
-        LocalDate deadlineAt, Columns columns, User user) {
+        LocalDate deadlineAt, Columns columns, User user, Team team) {
         this.cardTitle = cardTitle;
         this.cardContents = cardContents;
         this.cardOrder = cardOrder;
         this.deadlineAt = deadlineAt;
         this.columns = columns;
         this.user = user;
-//        this.team = team;
+        this.team = team;
     }
 
-//    public void update(String cardTitle, String cardContents,
-//        LocalDate deadlineAt, Columns columns, Team team) {
     public void update(String cardTitle, String cardContents,
-        LocalDate deadlineAt, Columns columns) {
+        LocalDate deadlineAt, Columns columns, Team team) {
         this.cardTitle = cardTitle;
         this.cardContents = cardContents;
         this.deadlineAt = deadlineAt;
         this.columns = columns;
-//        this.team = team;
+        this.team = team;
     }
 
 }

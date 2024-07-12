@@ -1,12 +1,14 @@
 package jira6.fate.domain.card.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
+import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.entity.Card;
 import jira6.fate.domain.card.repository.CardRepository;
 import jira6.fate.domain.user.entity.User;
-import jira6.fate.domain.user.repository.UserRepository;
 import jira6.fate.global.exception.CustomException;
 import jira6.fate.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -115,4 +117,10 @@ public class CardService {
         return cardCreatorName.equals(currentUserName);
     }
 
+    public List<CardResponseDto> getAllCardByColumn(Long columnId) {
+        findColumn(columnId);
+
+        List<Card> cards = cardRepository.findByColumnId(columnId);
+        return cards.stream().map(CardResponseDto::new).collect(Collectors.toList());
+    }
 }

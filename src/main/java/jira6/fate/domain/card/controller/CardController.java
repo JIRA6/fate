@@ -76,12 +76,12 @@ public class CardController {
      * @return : 카드 상세 조회 성공 상태 코드 및 메시지 반환
      */
     @GetMapping("/columns/{columnId}/cards")
-    public ResponseEntity<DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>> getAllCardByColumn(
+    public ResponseEntity<DataResponse<List<CardResponseDto>>> getAllCardByColumn(
         @Min(1) @PathVariable Long columnId
     ) {
-        List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCardByColumn(
+        List<CardResponseDto> responseDto = cardService.getAllCardByColumn(
             columnId);
-        DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>(
+        DataResponse<List<CardResponseDto>> response = new DataResponse<>(
             200, "카드 컬렴럼 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

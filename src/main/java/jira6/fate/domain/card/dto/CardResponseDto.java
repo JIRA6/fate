@@ -1,6 +1,7 @@
 package jira6.fate.domain.card.dto;
 
 import java.time.LocalDate;
+import jira6.fate.domain.card.entity.Card;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,9 @@ public class CardResponseDto {
         this.deadlineAt = deadlineAt;
     }
 
+    public CardResponseDto(Card card) {
+        this.cardId = card.getId();
+        this.cardTitle = card.getCardTitle();
+        this.deadlineAt = card.getDeadlineAt();
+    }
 }
