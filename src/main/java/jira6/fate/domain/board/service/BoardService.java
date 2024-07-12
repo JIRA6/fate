@@ -61,7 +61,7 @@ public class BoardService {
 
     public BoardResponseDto getBoardId(Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(
-            ()-> new CustomException(ErrorCode.BOARD_NOT_FOUND)
+            () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
         );
 
         return new BoardResponseDto(board);
