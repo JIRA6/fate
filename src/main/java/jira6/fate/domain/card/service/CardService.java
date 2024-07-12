@@ -3,6 +3,7 @@ package jira6.fate.domain.card.service;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import jira6.fate.domain.board.entity.Team;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
 import jira6.fate.domain.card.dto.CardListResponseDto;
@@ -10,11 +11,12 @@ import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.entity.Card;
 import jira6.fate.domain.card.repository.CardRepository;
+import jira6.fate.domain.column.entity.Columns;
+import jira6.fate.domain.column.repository.ColumnRepository;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.exception.CustomException;
 import jira6.fate.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Columns;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardService {
 
     private final CardRepository cardRepository;
-    private final ColumnsRepository columnsRepository;
+    private final ColumnRepository columnRepository;
     private final TeamRepository teamRepository;
 
     @Transactional
     public void createCard(Long columnId, CardCreateRequestDto requestDto, User user) {
-        Columns columns = findColumn(columnId);
+        Columns column = findColumn(columnId);
         Team team = findTeam(requestDto.getTeamId());
 
         Card card = Card.builder()
@@ -36,7 +38,7 @@ public class CardService {
             .cardContents(requestDto.getCardContents())
             .cardOrder(requestDto.getCardOrder())
             .deadlineAt(requestDto.getDeadlineAt())
-            .columns(columns)
+            .column(column)
             .user(user)
             .team(team)
             .build();
@@ -136,26 +138,24 @@ public class CardService {
         // 그룹화하여 컬럼별로 카드 목록을 나눔
         Map<Columns, List<CardResponseDto>> groupedByColumns = cards.stream()
             .collect(Collectors.groupingBy(
-                Card::getColumns,
+                Card::getColumn,
                 Collectors.mapping(
                     card -> CardResponseDto.builder()
-                        .cardId(card.getCardId())
-                        .cardTitle(card.getCardTitle()) // 추가
-                        .deadlineAt(card.getDeadlineAt()) // 추가
+                        .cardId(card.getId())
+                        .cardTitle(card.getCardTitle())
+                        .deadlineAt(card.getDeadlineAt())
                         .build(),
                     Collectors.toList()
                 )
             ));
 
-        // 결과를 DTO 리스트로 변환
-        List<CardListResponseDto<CardResponseDto>> cardListResponseDtos = groupedByColumns.entrySet().stream()
+        return groupedByColumns.entrySet()
+            .stream()
             .map(entry -> CardListResponseDto.<CardResponseDto>builder()
-                .columnId(entry.getKey().getColumnId())
+                .columnId(entry.getKey().getId())
                 .columnName(entry.getKey().getColumnName())
                 .cardData(entry.getValue())
                 .build())
             .collect(Collectors.toList());
-
-        return cardListResponseDtos;
     }
 }
