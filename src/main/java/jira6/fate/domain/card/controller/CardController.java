@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import java.util.List;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
+import jira6.fate.domain.card.dto.CardListResponseDto;
 import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.service.CardService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -82,6 +84,21 @@ public class CardController {
             columnId);
         DataResponse<List<CardResponseDto>> response = new DataResponse<>(
             200, "카드 컬렴럼 조회 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 카드 작업자별 조회 ( 인가 필요 )
+     *
+     * @return : 카드 상세 조회 성공 상태 코드 및 메시지 반환
+     */
+    @GetMapping("/cards/teams/{teamId}")
+    public ResponseEntity<DataResponse<CardListResponseDto<CardResponseDto>>> getAllCardByTeam(
+        @Min(1) @PathVariable Long teamId
+    ) {
+        CardListResponseDto<CardResponseDto> responseDto = cardService.getAllCardByTeam(teamId);
+        DataResponse<CardListResponseDto<CardResponseDto>> response = new DataResponse<>(
+            200, "카드 작업자별 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

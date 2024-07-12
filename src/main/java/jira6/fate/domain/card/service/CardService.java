@@ -1,9 +1,11 @@
 package jira6.fate.domain.card.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
+import jira6.fate.domain.card.dto.CardListResponseDto;
 import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.entity.Card;
@@ -117,10 +119,43 @@ public class CardService {
         return cardCreatorName.equals(currentUserName);
     }
 
+    @Transactional(readOnly = true)
     public List<CardResponseDto> getAllCardByColumn(Long columnId) {
         findColumn(columnId);
 
         List<Card> cards = cardRepository.findByColumnId(columnId);
         return cards.stream().map(CardResponseDto::new).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CardListResponseDto<CardResponseDto>> getAllCardByTeam(Long teamId) {
+        findTeam(teamId);
+
+        List<Card> cards = cardRepository.findByTeamId(teamId);
+
+        // 그룹화하여 컬럼별로 카드 목록을 나눔
+        Map<Columns, List<CardResponseDto>> groupedByColumns = cards.stream()
+            .collect(Collectors.groupingBy(
+                Card::getColumns,
+                Collectors.mapping(
+                    card -> CardResponseDto.builder()
+                        .cardId(card.getCardId())
+                        .cardTitle(card.getCardTitle()) // 추가
+                        .deadlineAt(card.getDeadlineAt()) // 추가
+                        .build(),
+                    Collectors.toList()
+                )
+            ));
+
+        // 결과를 DTO 리스트로 변환
+        List<CardListResponseDto<CardResponseDto>> cardListResponseDtos = groupedByColumns.entrySet().stream()
+            .map(entry -> CardListResponseDto.<CardResponseDto>builder()
+                .columnId(entry.getKey().getColumnId())
+                .columnName(entry.getKey().getColumnName())
+                .cardData(entry.getValue())
+                .build())
+            .collect(Collectors.toList());
+
+        return cardListResponseDtos;
     }
 }
