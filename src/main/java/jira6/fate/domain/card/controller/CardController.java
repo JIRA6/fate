@@ -2,8 +2,11 @@ package jira6.fate.domain.card.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Min.List;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
+import jira6.fate.domain.card.dto.CardListResponseDto;
+import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.service.CardService;
 import jira6.fate.global.dto.DataResponse;
@@ -51,8 +54,8 @@ public class CardController {
     /**
      * 카드 조회 ( 인가 필요 )
      *
-     * @param columnId    : 컬럼 아이디
-     * @param cardId : 카드 아이디
+     * @param columnId : 컬럼 아이디
+     * @param cardId   : 카드 아이디
      * @return : 카드 상세 조회 성공 상태 코드 및 메시지 반환
      */
     @GetMapping("/columns/{columnId}/cards/{cardId}")
@@ -61,7 +64,25 @@ public class CardController {
         @Min(1) @PathVariable Long cardId
     ) {
         CardDetailResponseDto responseDto = cardService.getCard(columnId, cardId);
-        DataResponse<CardDetailResponseDto> response = new DataResponse<CardDetailResponseDto>(200, "카드 상세 조회 성공", responseDto);
+        DataResponse<CardDetailResponseDto> response = new DataResponse<CardDetailResponseDto>(200,
+            "카드 상세 조회 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 카드 컬럼별 조회 ( 인가 필요 )
+     *
+     * @param columnId : 컬럼 아이디
+     * @return : 카드 상세 조회 성공 상태 코드 및 메시지 반환
+     */
+    @GetMapping("/columns/{columnId}/cards")
+    public ResponseEntity<DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>> getAllCardByColumn(
+        @Min(1) @PathVariable Long columnId
+    ) {
+        List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCardByColumn(
+            columnId);
+        DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>(
+            200, "카드 컬렴럼 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -85,6 +106,9 @@ public class CardController {
         MessageResponse response = new MessageResponse(200, "카드 수정 성공");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // entity 공유.. 일정 늦어짐ㅠ
+
 
     /**
      * 카드 삭제 ( 인가 필요 )
