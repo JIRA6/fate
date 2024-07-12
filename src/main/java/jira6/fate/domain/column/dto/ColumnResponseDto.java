@@ -8,9 +8,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Builder
 public class ColumnResponseDto {
   private Long id;
   private String columnName;
   private Long boardId;
+
+  @Builder
+  public ColumnResponseDto(Long id, String columnName, Long boardId) {
+    this.id = id;
+    this.columnName= columnName;
+    this.boardId = boardId;
+  }
+
 }

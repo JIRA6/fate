@@ -5,6 +5,6 @@ import jira6.fate.domain.column.entity.Columns;
 import java.util.List;
 
 public interface ColumnRepository extends JpaRepository<Columns, Long> {
-  boolean existsByNameAndBoardId(String name, Long boardId);
+  boolean existsByColumnNameAndBoardId(String name, Long boardId);
   List<Columns> findByBoardId(Long boardId);
 }

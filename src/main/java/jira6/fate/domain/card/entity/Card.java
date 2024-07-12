@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDate;
+
+import jira6.fate.domain.column.entity.Columns;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
 import lombok.Builder;

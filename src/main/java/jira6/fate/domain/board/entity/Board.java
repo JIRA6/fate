@@ -10,7 +10,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jira6.fate.domain.column.entity.Columns;
+import jira6.fate.domain.user.entity.User;
+import jira6.fate.global.entity.Timestamped;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.HashSet;
+import java.util.List;
 
 @Entity
 @Table(name = "table_board")
@@ -33,7 +41,7 @@ public class Board extends Timestamped {
     private User user;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-    private List<Column> columns;
+    private List<Columns> columns;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Team> teams;

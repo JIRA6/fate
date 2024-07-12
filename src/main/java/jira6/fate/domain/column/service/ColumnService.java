@@ -36,7 +36,7 @@ public class ColumnService {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
-    if (columnRepository.existsByNameAndBoardId(columnRequestDto.getColumnName(), columnRequestDto.getBoardId())) {
+    if (columnRepository.existsByColumnNameAndBoardId(columnRequestDto.getColumnName(), columnRequestDto.getBoardId())) {
       throw new CustomException(ErrorCode.USER_NOT_UNIQUE);
     }
 

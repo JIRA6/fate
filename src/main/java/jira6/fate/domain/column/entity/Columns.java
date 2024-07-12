@@ -1,15 +1,6 @@
 package jira6.fate.domain.column.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jira6.fate.domain.board.entity.Board;
 import jira6.fate.global.entity.Timestamped;
 import lombok.Builder;
@@ -47,5 +38,13 @@ public class Columns extends Timestamped {
     this.columnName = columnName;
     this.columnOrder = columnOrder;
     this.board = board;
+  }
+
+  public void updateColumnName(String columnName) {
+
+  }
+
+  public void updateColumnOrder(Long columnOrder) {
+
   }
 }
