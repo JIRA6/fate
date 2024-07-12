@@ -69,6 +69,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             response.getWriter().write("아이디, 비밀번호를 확인해주세요.");
         }
 
+        String accessToken = jwtProvider.generateAccessToken(username, userRole);
+        jwtProvider.addAccessTokenHeader(response, accessToken);
+
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("로그인 테스트 성공");
