@@ -27,6 +27,8 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsServiceImpl userDetailsService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -52,21 +54,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable);
-        http.sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(
-                SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers("/api/users/signup").permitAll()
-                .requestMatchers(
-                    "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**", "/swagger-resources",
-                    "/swagger-resources/**", "/configuration/ui", "/configuration/security",
-                    "/swagger-ui/**",
-                    "/webjars/**", "/swagger-ui.html", "/api/auth/**", "/login", "/login.html"
-                ).permitAll()
-                .anyRequest().authenticated())
-            .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+        http.sessionManagement( (sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests( (authorizeHttpRequests) -> authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/api/users/signup").permitAll()
+                        .anyRequest().authenticated())
+                .exceptionHandling( (exceptionHandling) -> {
+                    exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint);
+                    exceptionHandling.accessDeniedHandler(customAccessDeniedHandler);
+                })
+                .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

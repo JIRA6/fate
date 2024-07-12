@@ -8,9 +8,14 @@ import jira6.fate.domain.user.dto.UserLoginRequestDto;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.domain.user.entity.UserStatus;
 import jira6.fate.domain.user.repository.UserRepository;
+import jira6.fate.global.dto.MessageResponse;
+import jira6.fate.global.exception.ErrorCode;
 import jira6.fate.global.jwt.JwtProvider;
 import jira6.fate.global.security.UserDetailsImpl;
+import jira6.fate.global.security.dto.SecurityErrorResponse;
+import jira6.fate.global.security.dto.SecurityMessageResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -61,28 +66,39 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = userDetails.getUsername();
         String userRole = userDetails.getAuthorities().iterator().next().getAuthority();
 
-        User user = userRepository.findByUserName(username).orElseThrow( () -> new UsernameNotFoundException("아이디, 비밀번호를 확인해주세요.2"));
+        User user = userRepository.findByUserName(username).orElseThrow( () -> new UsernameNotFoundException("아이디, 비밀번호를 확인해주세요."));
 
         if (user.getUserStatus().equals(UserStatus.LEAVE)) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("아이디, 비밀번호를 확인해주세요.");
+
+            SecurityErrorResponse securityErrorResponse = new SecurityErrorResponse();
+            securityErrorResponse.sendResponse(response, ErrorCode.CHECK_USERNAME_PASSWORD);
+
         }
 
         String accessToken = jwtProvider.generateAccessToken(username, userRole);
+        String refreshToken = jwtProvider.generateRefreshToken(username, userRole);
+        ResponseCookie responseCookie = jwtProvider.createRefreshTokenCookie(refreshToken);
         jwtProvider.addAccessTokenHeader(response, accessToken);
+        jwtProvider.addRefreshTokenCookie(response, responseCookie.toString());
 
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("로그인 테스트 성공");
+        user.updateRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        MessageResponse messageResponse = MessageResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("로그인 성공")
+                .build();
+        SecurityMessageResponse securityMessageResponse = new SecurityMessageResponse();
+        securityMessageResponse.sendResponse(response, messageResponse);
 
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("아이디, 비밀번호를 확인해주세요.");
+
+        SecurityErrorResponse securityErrorResponse = new SecurityErrorResponse();
+        securityErrorResponse.sendResponse(response, ErrorCode.CHECK_USERNAME_PASSWORD);
+
     }
 
 }

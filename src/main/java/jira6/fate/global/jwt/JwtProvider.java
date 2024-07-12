@@ -3,9 +3,12 @@ package jira6.fate.global.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -59,8 +62,38 @@ public class JwtProvider {
         return substringBearer(authorization);
     }
 
+    public String getRefreshTokenFromHeader(HttpServletRequest request) {
+
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie: cookies) {
+            if ("RefreshToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
+    }
+
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from("RefreshToken", refreshToken)
+                .httpOnly(true)
+                .maxAge(refreshTokenExpiration / 1000)
+                .path("/")
+                .sameSite("None")
+                .build();
+    }
+
     public void addAccessTokenHeader(HttpServletResponse response, String accessToken) {
         response.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
+    }
+
+    public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshToken);
     }
 
     public Claims getClaimsFromToken(String token) throws ExpiredJwtException, JwtException {

@@ -45,4 +45,8 @@ public class User extends Timestamped {
         this.userRole = UserRole.MANAGER;
     }
 
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }
