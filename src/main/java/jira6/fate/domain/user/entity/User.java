@@ -45,6 +45,10 @@ public class User extends Timestamped {
         this.userRole = UserRole.MANAGER;
     }
 
+    public void setStatusToLeave() {
+        this.userStatus = UserStatus.LEAVE;
+    }
+
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
