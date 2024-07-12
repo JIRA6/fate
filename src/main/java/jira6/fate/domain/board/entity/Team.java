@@ -11,9 +11,14 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "table_team")
+@Getter
+@NoArgsConstructor
 public class Team extends Timestamped {
 
     @Id
@@ -30,4 +35,10 @@ public class Team extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
+
+    @Builder
+    public Team(User user, Board board) {
+        this.user = user;
+        this.board = board;
+    }
 }
