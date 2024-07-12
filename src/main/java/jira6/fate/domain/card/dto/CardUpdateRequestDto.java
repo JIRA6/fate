@@ -5,15 +5,12 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class CardCreateRequestDto {
+public class CardUpdateRequestDto {
 
     @NotBlank
     private String cardTitle;
 
     private String cardContents;
-
-    @NotBlank
-    private Long cardOrder;
 
     private String managerName;
 

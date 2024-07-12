@@ -1,14 +1,18 @@
 package jira6.fate.domain.card.service;
 
+import static jira6.fate.global.exception.ErrorCode.COLUMN_NOT_FOUND;
+
 import jakarta.transaction.Transactional;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
+import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.entity.Card;
 import jira6.fate.domain.card.repository.CardRepository;
 import jira6.fate.domain.user.entity.User;
+import jira6.fate.global.exception.CustomException;
+import jira6.fate.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Columns;
 import org.springframework.stereotype.Service;
-
-import static jira6.fate.global.exception.ErrorCode.COLUMN_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +38,29 @@ public class CardService {
         cardRepository.save(card);
     }
 
-    public Columns existsByColumn(Long columnId) {
-        return columnRepository.findById(columnId).orElseThrow(COLUMN_NOT_FOUND);
+    @Transactional
+    public void updateCard(Long columnId, Long cardId, CardUpdateRequestDto requestDto) {
+        Columns column = findColumn(columnId);
+        Card card = findCard(cardId);
+
+        card.update(
+            requestDto.getCardTitle(),
+            requestDto.getCardContents(),
+            requestDto.getManagerName(),
+            requestDto.getDeadlineAt(),
+            column
+        );
     }
 
+    public Columns findColumn(Long columnId) {
+        return columnRepository.findById(columnId).orElseThrow(
+            () -> new CustomException(COLUMN_NOT_FOUND)
+        );
+    }
+
+    public Card findCard(Long cardId) {
+        return cardRepository.findById(cardId).orElseThrow(
+            () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
+        );
+    }
 }
