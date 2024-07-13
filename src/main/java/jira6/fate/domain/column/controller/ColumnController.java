@@ -60,16 +60,18 @@ public class ColumnController {
 
     @DeleteMapping("/boards/{boardId}/columns/{columnId}")
     public ResponseEntity<?> deleteColumn(
-        @PathVariable Long columnId,
+        @Min(1) @PathVariable Long boardId,
+        @Min(1) @PathVariable Long columnId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        try {
-            columnService.deleteColumn(columnId, userDetails.getUser().getUserName());
-            return ResponseEntity.ok().build();
-        } catch (CustomException e) {
-            return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(e.getErrorCode().getMessage());
-        }
+        columnService.deleteColumn(boardId, columnId, userDetails.getUser());
+
+        MessageResponse response = MessageResponse.builder()
+            .statusCode(204)
+            .message("컬럼 삭제 성공")
+            .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/boards/{boardId}/columns")

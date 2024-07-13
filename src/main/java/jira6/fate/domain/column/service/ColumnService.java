@@ -57,12 +57,9 @@ public class ColumnService {
   }
 
   @Transactional
-  public void deleteColumn(Long columnId, String username) {
-    User user = userRepository.findByUserName(username)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    Columns column = columnRepository.findById(columnId)
-        .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
-    Board board = column.getBoard();
+  public void deleteColumn(Long boardId, Long columnId, User user) {
+    Board board = findBoard(boardId);
+    Columns column = findColumn(columnId);
 
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
