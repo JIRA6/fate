@@ -6,6 +6,8 @@ import java.util.List;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
 import jira6.fate.domain.card.dto.CardListResponseDto;
+import jira6.fate.domain.card.dto.CardOrderListRequestDto;
+import jira6.fate.domain.card.dto.CardOrderRequestDto;
 import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.service.CardService;
@@ -53,6 +55,40 @@ public class CardController {
     }
 
     /**
+     * 카드 순서 이동 ( 인가 필요 )
+     *
+     * @param columnId    : 컬럼 아이디
+     * @param requestDto  : 이동된 카드 순서의 정보
+     * @return : 카드 순서 이동 성공 상태 코드 및 메시지 반환
+     */
+    @PutMapping("/columns/{columnId}/cards/order")
+    public ResponseEntity<MessageResponse> updateCardOrder(
+        @Min(1) @PathVariable Long columnId,
+        @Valid @RequestBody CardOrderListRequestDto requestDto
+    ) {
+        cardService.updateCardOrder(columnId, requestDto);
+        MessageResponse response = new MessageResponse(200, "카드 순서 이동 성공");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    /**
+     * 카드 전체 조회 ( 인가 필요 )
+     *
+     * @param boardId : 보드 아이디
+     * @return : 카드 전체 조회 성공 상태 코드 및 메시지 반환
+     */
+    @GetMapping("/boards/{boardId}/cards")
+    public ResponseEntity<DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>> getAllCard(
+        @Min(1) @PathVariable Long boardId
+    ) {
+        List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCard(
+            boardId);
+        DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>(
+            200, "카드 컬렴럼 조회 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
      * 카드 조회 ( 인가 필요 )
      *
      * @param columnId : 컬럼 아이디
@@ -93,11 +129,11 @@ public class CardController {
      * @return : 카드 작업자별 조회 성공 상태 코드 및 메시지 반환
      */
     @GetMapping("/cards/teams/{teamId}")
-    public ResponseEntity<DataResponse<List<CardListResponseDto<CardResponseDto>>>> getAllCardByTeam(
+    public ResponseEntity<DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>> getAllCardByTeam(
         @Min(1) @PathVariable Long teamId
     ) {
-        List<CardListResponseDto<CardResponseDto>> responseDto = cardService.getAllCardByTeam(teamId);
-        DataResponse<List<CardListResponseDto<CardResponseDto>>> response = new DataResponse<>(
+        List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCardByTeam(teamId);
+        DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<>(
             200, "카드 작업자별 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -122,9 +158,6 @@ public class CardController {
         MessageResponse response = new MessageResponse(200, "카드 수정 성공");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-    // entity 공유.. 일정 늦어짐ㅠ
-
 
     /**
      * 카드 삭제 ( 인가 필요 )

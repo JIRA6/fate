@@ -3,10 +3,16 @@ package jira6.fate.domain.card.service;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import jira6.fate.domain.board.entity.Board;
 import jira6.fate.domain.board.entity.Team;
+import jira6.fate.domain.board.repository.BoardRepository;
+import jira6.fate.domain.board.repository.TeamRepository;
 import jira6.fate.domain.card.dto.CardCreateRequestDto;
 import jira6.fate.domain.card.dto.CardDetailResponseDto;
 import jira6.fate.domain.card.dto.CardListResponseDto;
+import jira6.fate.domain.card.dto.CardOrderListRequestDto;
+import jira6.fate.domain.card.dto.CardOrderRequestDto;
 import jira6.fate.domain.card.dto.CardResponseDto;
 import jira6.fate.domain.card.dto.CardUpdateRequestDto;
 import jira6.fate.domain.card.entity.Card;
@@ -24,8 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CardService {
 
-    private final CardRepository cardRepository;
+    private final BoardRepository boardRepository;
     private final ColumnRepository columnRepository;
+    private final CardRepository cardRepository;
     private final TeamRepository teamRepository;
 
     @Transactional
@@ -99,6 +106,12 @@ public class CardService {
         cardRepository.delete(card);
     }
 
+    public Board findBoard(Long boardId) {
+        return boardRepository.findById(boardId).orElseThrow(
+            () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
+        );
+    }
+
     public Columns findColumn(Long columnId) {
         return columnRepository.findById(columnId).orElseThrow(
             () -> new CustomException(ErrorCode.COLUMN_NOT_FOUND)
@@ -130,11 +143,24 @@ public class CardService {
     }
 
     @Transactional(readOnly = true)
-    public List<CardListResponseDto<CardResponseDto>> getAllCardByTeam(Long teamId) {
+    public List<CardListResponseDto<List<CardResponseDto>>> getAllCardByTeam(Long teamId) {
         findTeam(teamId);
 
         List<Card> cards = cardRepository.findByTeamId(teamId);
 
+        return groupAndMapToResponse(cards);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CardListResponseDto<List<CardResponseDto>>> getAllCard(Long boardId) {
+        findBoard(boardId);
+
+        List<Card> cards = StreamSupport.stream(cardRepository.findAll().spliterator(), false).toList();
+
+        return groupAndMapToResponse(cards);
+    }
+
+    private List<CardListResponseDto<List<CardResponseDto>>> groupAndMapToResponse(List<Card> cards) {
         // 그룹화하여 컬럼별로 카드 목록을 나눔
         Map<Columns, List<CardResponseDto>> groupedByColumns = cards.stream()
             .collect(Collectors.groupingBy(
@@ -142,6 +168,7 @@ public class CardService {
                 Collectors.mapping(
                     card -> CardResponseDto.builder()
                         .cardId(card.getId())
+                        .cardOrder(card.getCardOrder())
                         .cardTitle(card.getCardTitle())
                         .deadlineAt(card.getDeadlineAt())
                         .build(),
@@ -151,11 +178,31 @@ public class CardService {
 
         return groupedByColumns.entrySet()
             .stream()
-            .map(entry -> CardListResponseDto.<CardResponseDto>builder()
+            .map(entry -> CardListResponseDto.<List<CardResponseDto>>builder()
                 .columnId(entry.getKey().getId())
                 .columnName(entry.getKey().getColumnName())
                 .cardData(entry.getValue())
                 .build())
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateCardOrder(Long columnId, CardOrderListRequestDto requestDto) {
+        findColumn(columnId);
+
+        List<CardOrderRequestDto> cardOrders = requestDto.getOrderData();
+
+        for (CardOrderRequestDto cardOrder : cardOrders) {
+            Long cardId = cardOrder.getCardId();
+            Long order = cardOrder.getCardOrder();
+
+            Card card = cardRepository.findById(cardId).orElseThrow(
+                () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
+            );
+
+            card.updateCardOrder(order);
+
+            cardRepository.save(card); // 순서 업데이트 저장
+        }
     }
 }

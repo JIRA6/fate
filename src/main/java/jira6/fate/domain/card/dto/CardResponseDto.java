@@ -10,18 +10,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CardResponseDto {
     private Long cardId;
+    private Long cardOrder;
     private String cardTitle;
     private LocalDate deadlineAt;
 
     @Builder
-    public CardResponseDto(Long cardId, String cardTitle, LocalDate deadlineAt) {
+    public CardResponseDto(Long cardId, Long cardOrder, String cardTitle, LocalDate deadlineAt) {
         this.cardId = cardId;
+        this.cardOrder = cardOrder;
         this.cardTitle = cardTitle;
         this.deadlineAt = deadlineAt;
     }
 
     public CardResponseDto(Card card) {
         this.cardId = card.getId();
+        this.cardOrder = card.getCardOrder();
         this.cardTitle = card.getCardTitle();
         this.deadlineAt = card.getDeadlineAt();
     }
