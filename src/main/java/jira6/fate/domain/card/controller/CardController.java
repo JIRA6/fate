@@ -150,8 +150,8 @@ public class CardController {
     @PutMapping("/columns/{columnId}/cards/{cardId}")
     public ResponseEntity<MessageResponse> updateCard(
         @Min(1) @PathVariable Long columnId,
-        @Valid @Min(1) @PathVariable Long cardId,
-        @RequestBody CardUpdateRequestDto requestDto,
+        @Min(1) @PathVariable Long cardId,
+        @Valid @RequestBody CardUpdateRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         cardService.updateCard(columnId, cardId, requestDto, userDetails.getUser());
