@@ -14,6 +14,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDate;
 
+import jira6.fate.domain.board.entity.Team;
 import jira6.fate.domain.column.entity.Columns;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
@@ -46,39 +47,35 @@ public class Card extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "column_id", nullable = false)
-    private Columns columns;
+    private Columns column;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "team_id")
-//    private Team team;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @Builder
-//    public Card(String cardTitle, String cardContents, Long cardOrder,
-//        LocalDate deadlineAt, Columns columns, User user, Team team) {
     public Card(String cardTitle, String cardContents, Long cardOrder,
-        LocalDate deadlineAt, Columns columns, User user) {
+        LocalDate deadlineAt, Columns column, User user, Team team) {
         this.cardTitle = cardTitle;
         this.cardContents = cardContents;
         this.cardOrder = cardOrder;
         this.deadlineAt = deadlineAt;
-        this.columns = columns;
+        this.column = column;
         this.user = user;
-//        this.team = team;
+        this.team = team;
     }
 
-    //    public void update(String cardTitle, String cardContents,
-//        LocalDate deadlineAt, Columns columns, Team team) {
     public void update(String cardTitle, String cardContents,
-        LocalDate deadlineAt, Columns columns) {
+        LocalDate deadlineAt, Columns column, Team team) {
         this.cardTitle = cardTitle;
         this.cardContents = cardContents;
         this.deadlineAt = deadlineAt;
-        this.columns = columns;
-//        this.team = team;
+        this.column = column;
+        this.team = team;
     }
 
 }
