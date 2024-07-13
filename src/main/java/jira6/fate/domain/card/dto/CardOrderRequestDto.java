@@ -6,10 +6,8 @@ import lombok.Getter;
 @Getter
 public class CardOrderRequestDto {
 
-    @NotBlank
     private Long cardId;
 
-    @NotBlank
     private Long cardOrder;
 
 }

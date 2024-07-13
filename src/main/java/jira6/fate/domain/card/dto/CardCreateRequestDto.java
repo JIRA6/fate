@@ -13,7 +13,6 @@ public class CardCreateRequestDto {
 
     private String cardContents;
 
-    @NotBlank
     private Long cardOrder;
 
     private LocalDate deadlineAt;
