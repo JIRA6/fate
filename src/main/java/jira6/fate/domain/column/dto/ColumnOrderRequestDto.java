@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ColumnOrderRequestDto {
+
   private Long columnId;
   private Long columnOrder;
+
 }

@@ -1,9 +1,9 @@
 package jira6.fate.domain.column.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import jira6.fate.domain.board.entity.Board;
 import jira6.fate.domain.board.repository.BoardRepository;
-import jira6.fate.domain.card.dto.CardOrderRequestDto;
-import jira6.fate.domain.card.entity.Card;
 import jira6.fate.domain.column.dto.ColumnOrderListRequestDto;
 import jira6.fate.domain.column.dto.ColumnOrderRequestDto;
 import jira6.fate.domain.column.dto.ColumnRequestDto;
@@ -12,119 +12,115 @@ import jira6.fate.domain.column.entity.Columns;
 import jira6.fate.domain.column.repository.ColumnRepository;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.domain.user.entity.UserRole;
-import jira6.fate.domain.user.repository.UserRepository;
 import jira6.fate.global.exception.CustomException;
 import jira6.fate.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ColumnService {
 
-  private final ColumnRepository columnRepository;
-  private final BoardRepository boardRepository;
-  private final UserRepository userRepository;
+    private final ColumnRepository columnRepository;
+    private final BoardRepository boardRepository;
 
-  @Transactional
-  public void createColumn(Long boardId, ColumnRequestDto columnRequestDto, User user) {
-    Board board = findBoard(boardId);
+    @Transactional
+    public void createColumn(Long boardId, ColumnRequestDto columnRequestDto, User user) {
+        Board board = findBoard(boardId);
 
-    if (!hasAccessToBoard(user, board)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        if (!hasAccessToBoard(user, board)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        }
+
+        Columns column = Columns.builder()
+            .columnName(columnRequestDto.getColumnName())
+            .columnOrder(columnRequestDto.getColumnOrder())
+            .board(board)
+            .build();
+
+        columnRepository.save(column);
     }
 
-    Columns column = Columns.builder()
-        .columnName(columnRequestDto.getColumnName())
-        .columnOrder(columnRequestDto.getColumnOrder())
-        .board(board)
-        .build();
+    @Transactional
+    public void updateColumn(Long boardId, Long columnId, ColumnRequestDto columnRequestDto,
+        User user) {
+        Board board = findBoard(boardId);
+        Columns column = findColumn(columnId);
 
-    columnRepository.save(column);
-  }
+        if (!hasAccessToBoard(user, board)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        }
 
-  @Transactional
-  public void updateColumn(Long boardId, Long columnId, ColumnRequestDto columnRequestDto, User user) {
-    Board board = findBoard(boardId);
-    Columns column = findColumn(columnId);
-
-    if (!hasAccessToBoard(user, board)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        column.update(columnRequestDto.getColumnName());
     }
 
-    column.update(columnRequestDto.getColumnName());
-  }
+    @Transactional
+    public void deleteColumn(Long boardId, Long columnId, User user) {
+        Board board = findBoard(boardId);
+        Columns column = findColumn(columnId);
 
-  @Transactional
-  public void deleteColumn(Long boardId, Long columnId, User user) {
-    Board board = findBoard(boardId);
-    Columns column = findColumn(columnId);
+        if (!hasAccessToBoard(user, board)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        }
 
-    if (!hasAccessToBoard(user, board)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        columnRepository.delete(column);
     }
 
-    columnRepository.delete(column);
-  }
+    @Transactional(readOnly = true)
+    public List<ColumnResponseDto> getColumns(Long boardId, User user) {
+        Board board = findBoard(boardId);
 
-  @Transactional(readOnly = true)
-  public List<ColumnResponseDto> getColumns(Long boardId, User user) {
-    Board board = findBoard(boardId);
+        if (!hasAccessToBoard(user, board)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        }
 
-    if (!hasAccessToBoard(user, board)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        List<Columns> columns = columnRepository.findByBoardId(boardId);
+
+        return columns.stream()
+            .map(column -> ColumnResponseDto.builder()
+                .id(column.getId())
+                .columnName(column.getColumnName())
+                .build())
+            .collect(Collectors.toList());
     }
 
-    List<Columns> columns = columnRepository.findByBoardId(boardId);
+    @Transactional
+    public void updateColumnOrder(Long boardId, ColumnOrderListRequestDto requestDto, User user) {
+        Board board = findBoard(boardId);
 
-    return columns.stream()
-        .map(column -> ColumnResponseDto.builder()
-            .id(column.getId())
-            .columnName(column.getColumnName())
-            .build())
-        .collect(Collectors.toList());
-  }
+        if (!hasAccessToBoard(user, board)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        }
 
-  @Transactional
-  public void updateColumnOrder(Long boardId, ColumnOrderListRequestDto requestDto, User user) {
-    Board board = findBoard(boardId);
+        List<ColumnOrderRequestDto> columnOrders = requestDto.getOrderData();
 
-    if (!hasAccessToBoard(user, board)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
+        for (ColumnOrderRequestDto columnOrder : columnOrders) {
+            Long columnId = columnOrder.getColumnId();
+            Long order = columnOrder.getColumnOrder();
+
+            Columns column = columnRepository.findById(columnId).orElseThrow(
+                () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
+            );
+
+            column.updateColumnOrder(order);
+
+            columnRepository.save(column); // 순서 업데이트 저장
+        }
     }
 
-    List<ColumnOrderRequestDto> columnOrders = requestDto.getOrderData();
-
-    for (ColumnOrderRequestDto columnOrder : columnOrders) {
-      Long columnId = columnOrder.getColumnId();
-      Long order = columnOrder.getColumnOrder();
-
-      Columns column = columnRepository.findById(columnId).orElseThrow(
-          () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
-      );
-
-      column.updateColumnOrder(order);
-
-      columnRepository.save(column); // 순서 업데이트 저장
+    private boolean hasAccessToBoard(User user, Board board) {
+        return user.getUserRole() == UserRole.MANAGER;
     }
-  }
 
-  private boolean hasAccessToBoard(User user, Board board) {
-    return user.getUserRole() == UserRole.MANAGER;
-  }
+    private Board findBoard(Long boardId) {
+        return boardRepository.findById(boardId)
+            .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+    }
 
-  private Board findBoard(Long boardId) {
-    return boardRepository.findById(boardId)
-        .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-  }
-
-  private Columns findColumn(Long columnId) {
-    return columnRepository.findById(columnId)
-        .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
-  }
+    private Columns findColumn(Long columnId) {
+        return columnRepository.findById(columnId)
+            .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
+    }
 
 }
