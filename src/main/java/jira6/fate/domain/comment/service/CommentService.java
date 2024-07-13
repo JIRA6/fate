@@ -2,6 +2,7 @@ package jira6.fate.domain.comment.service;
 
 import java.util.List;
 import jira6.fate.domain.card.entity.Card;
+import jira6.fate.domain.card.repository.CardRepository;
 import jira6.fate.domain.comment.dto.CommentAllResponseDto;
 import jira6.fate.domain.comment.dto.CommentCreateRequestDto;
 import jira6.fate.domain.comment.entity.Comment;
