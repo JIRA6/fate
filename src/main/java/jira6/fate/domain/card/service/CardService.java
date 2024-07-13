@@ -139,7 +139,9 @@ public class CardService {
         findColumn(columnId);
 
         List<Card> cards = cardRepository.findByColumnId(columnId);
-        return cards.stream().map(CardResponseDto::new).collect(Collectors.toList());
+        return cards.stream()
+            .map(CardResponseDto::fromCard)
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
