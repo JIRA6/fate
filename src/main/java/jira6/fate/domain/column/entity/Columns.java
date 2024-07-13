@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "column_table")
+@Table(name = "table_column")
 @Getter
 @NoArgsConstructor
 public class Columns extends Timestamped {
