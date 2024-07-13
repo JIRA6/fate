@@ -1,15 +1,16 @@
 package jira6.fate.domain.card.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+
 import lombok.Getter;
 
 @Getter
 public class CardOrderRequestDto {
 
-    @NotBlank
+    @Min(1)
     private Long cardId;
 
-    @NotBlank
+    @Min(1)
     private Long cardOrder;
 
 }

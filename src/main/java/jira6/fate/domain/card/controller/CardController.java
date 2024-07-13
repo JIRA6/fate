@@ -84,7 +84,7 @@ public class CardController {
         List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCard(
             boardId);
         DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>(
-            200, "카드 컬렴럼 조회 성공", responseDto);
+            200, "카드 컬렴별 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -150,8 +150,8 @@ public class CardController {
     @PutMapping("/columns/{columnId}/cards/{cardId}")
     public ResponseEntity<MessageResponse> updateCard(
         @Min(1) @PathVariable Long columnId,
-        @Valid @Min(1) @PathVariable Long cardId,
-        @RequestBody CardUpdateRequestDto requestDto,
+        @Min(1) @PathVariable Long cardId,
+        @Valid @RequestBody CardUpdateRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         cardService.updateCard(columnId, cardId, requestDto, userDetails.getUser());

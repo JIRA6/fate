@@ -22,10 +22,12 @@ public class CardResponseDto {
         this.deadlineAt = deadlineAt;
     }
 
-    public CardResponseDto(Card card) {
-        this.cardId = card.getId();
-        this.cardOrder = card.getCardOrder();
-        this.cardTitle = card.getCardTitle();
-        this.deadlineAt = card.getDeadlineAt();
+    public static CardResponseDto fromCard(Card card) {
+        return CardResponseDto.builder()
+            .cardId(card.getId())
+            .cardOrder(card.getCardOrder())
+            .cardTitle(card.getCardTitle())
+            .deadlineAt(card.getDeadlineAt())
+            .build();
     }
 }
