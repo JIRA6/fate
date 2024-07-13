@@ -2,7 +2,10 @@ package jira6.fate.domain.column.service;
 
 import jira6.fate.domain.board.entity.Board;
 import jira6.fate.domain.board.repository.BoardRepository;
-import jira6.fate.domain.column.dto.ColumnOrderDto;
+import jira6.fate.domain.card.dto.CardOrderRequestDto;
+import jira6.fate.domain.card.entity.Card;
+import jira6.fate.domain.column.dto.ColumnOrderListRequestDto;
+import jira6.fate.domain.column.dto.ColumnOrderRequestDto;
 import jira6.fate.domain.column.dto.ColumnRequestDto;
 import jira6.fate.domain.column.dto.ColumnResponseDto;
 import jira6.fate.domain.column.entity.Columns;
@@ -87,22 +90,27 @@ public class ColumnService {
   }
 
   @Transactional
-  public void updateColumnOrder(Long boardId, List<ColumnOrderDto> columnOrderDtos, String username) {
-    User user = userRepository.findByUserName(username)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+  public void updateColumnOrder(Long boardId, ColumnOrderListRequestDto requestDto, User user) {
+    Board board = findBoard(boardId);
 
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
-    columnOrderDtos.forEach(columnOrderDto -> {
-      Columns column = columnRepository.findById(columnOrderDto.getColumnId())
-          .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
-      column.updateColumnOrder(columnOrderDto.getColumnOrder());
-      columnRepository.save(column);
-    });
+    List<ColumnOrderRequestDto> columnOrders = requestDto.getOrderData();
+
+    for (ColumnOrderRequestDto columnOrder : columnOrders) {
+      Long columnId = columnOrder.getColumnId();
+      Long order = columnOrder.getColumnOrder();
+
+      Columns column = columnRepository.findById(columnId).orElseThrow(
+          () -> new CustomException(ErrorCode.CARD_NOT_FOUND)
+      );
+
+      column.updateColumnOrder(order);
+
+      columnRepository.save(column); // 순서 업데이트 저장
+    }
   }
 
   private boolean hasAccessToBoard(User user, Board board) {

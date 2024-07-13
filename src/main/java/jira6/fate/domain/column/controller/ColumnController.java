@@ -3,7 +3,8 @@ package jira6.fate.domain.column.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.util.List;
-import jira6.fate.domain.column.dto.ColumnOrderDto;
+import jira6.fate.domain.column.dto.ColumnOrderListRequestDto;
+import jira6.fate.domain.column.dto.ColumnOrderRequestDto;
 import jira6.fate.domain.column.dto.ColumnRequestDto;
 import jira6.fate.domain.column.dto.ColumnResponseDto;
 import jira6.fate.domain.column.service.ColumnService;
@@ -97,19 +98,19 @@ public class ColumnController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/boards/{boardId}/columns/{columnId}/order")
+    @PostMapping("/boards/{boardId}/columns/order")
     public ResponseEntity<?> updateColumnOrder(
         @PathVariable Long boardId,
-        @PathVariable Long columnId,
-        @RequestBody List<ColumnOrderDto> columnOrderDtos,
+        @RequestBody ColumnOrderListRequestDto columnOrderListRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        try {
-            columnService.updateColumnOrder(boardId, columnOrderDtos, userDetails.getUser().getUserName());
-            return ResponseEntity.ok().body("컬럼 순서 이동 성공");
-        } catch (CustomException e) {
-            return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(e.getErrorCode().getMessage());
-        }
+        columnService.updateColumnOrder(boardId, columnOrderListRequestDto, userDetails.getUser());
+
+        MessageResponse response = MessageResponse.builder()
+            .statusCode(200)
+            .message("컬럼 순서 이동 성공")
+            .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

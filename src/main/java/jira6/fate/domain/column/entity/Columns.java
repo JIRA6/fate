@@ -41,4 +41,5 @@ public class Columns extends Timestamped {
   public void updateColumnOrder(Long columnOrder) {
     this.columnOrder = columnOrder;
   }
+
 }
