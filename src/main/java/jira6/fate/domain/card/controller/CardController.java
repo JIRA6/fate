@@ -84,7 +84,7 @@ public class CardController {
         List<CardListResponseDto<List<CardResponseDto>>> responseDto = cardService.getAllCard(
             boardId);
         DataResponse<List<CardListResponseDto<List<CardResponseDto>>>> response = new DataResponse<List<CardListResponseDto<List<CardResponseDto>>>>(
-            200, "카드 컬렴럼 조회 성공", responseDto);
+            200, "카드 컬렴별 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
