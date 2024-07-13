@@ -9,8 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import jira6.fate.domain.board.entity.Board;
+import jira6.fate.domain.card.entity.Card;
 import jira6.fate.global.entity.Timestamped;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +39,9 @@ public class Columns extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "board_id", nullable = false)
   private Board board;
+
+  @OneToMany(mappedBy = "column", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private List<Card> cards;
 
   @Builder
   public Columns(String columnName, Long columnOrder, Board board) {

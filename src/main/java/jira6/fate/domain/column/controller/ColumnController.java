@@ -96,7 +96,7 @@ public class ColumnController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/boards/{boardId}/columns/order")
+    @PutMapping("/boards/{boardId}/columns/order")
     public ResponseEntity<?> updateColumnOrder(
         @PathVariable Long boardId,
         @RequestBody ColumnOrderListRequestDto columnOrderListRequestDto,
