@@ -69,22 +69,19 @@ public class ColumnService {
   }
 
   @Transactional(readOnly = true)
-  public List<ColumnResponseDto> getColumns(Long boardId, String username) {
-    User user = userRepository.findByUserName(username)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+  public List<ColumnResponseDto> getColumns(Long boardId, User user) {
+    Board board = findBoard(boardId);
 
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
     List<Columns> columns = columnRepository.findByBoardId(boardId);
+
     return columns.stream()
         .map(column -> ColumnResponseDto.builder()
             .id(column.getId())
             .columnName(column.getColumnName())
-            .boardId(column.getBoard().getId())
             .build())
         .collect(Collectors.toList());
   }

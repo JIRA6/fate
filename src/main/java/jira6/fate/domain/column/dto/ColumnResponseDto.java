@@ -10,13 +10,11 @@ import lombok.Setter;
 public class ColumnResponseDto {
   private Long id;
   private String columnName;
-  private Long boardId;
 
   @Builder
-  public ColumnResponseDto(Long id, String columnName, Long boardId) {
+  public ColumnResponseDto(Long id, String columnName) {
     this.id = id;
     this.columnName= columnName;
-    this.boardId = boardId;
   }
 
 }
