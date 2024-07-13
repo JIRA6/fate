@@ -26,32 +26,20 @@ public class ColumnService {
   private final BoardRepository boardRepository;
   private final UserRepository userRepository;
 
-  public ColumnResponseDto createColumn(ColumnRequestDto columnRequestDto, String username) {
-    User user = userRepository.findByUserName(username)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    Board board = boardRepository.findById(columnRequestDto.getBoardId())
-        .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+  public void createColumn(Long boardId, ColumnRequestDto columnRequestDto, User user) {
+    Board board = findBoard(boardId);
 
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
-    if (columnRepository.existsByColumnNameAndBoardId(columnRequestDto.getColumnName(), columnRequestDto.getBoardId())) {
-      throw new CustomException(ErrorCode.USER_NOT_UNIQUE);
-    }
-
     Columns column = Columns.builder()
         .columnName(columnRequestDto.getColumnName())
-        .columnOrder(0L) // 기본 순서
+        .columnOrder(columnRequestDto.getColumnOrder())
         .board(board)
         .build();
-    Columns savedColumn = columnRepository.save(column);
 
-    return ColumnResponseDto.builder()
-        .id(savedColumn.getId())
-        .columnName(savedColumn.getColumnName())
-        .boardId(savedColumn.getBoard().getId())
-        .build();
+    columnRepository.save(column);
   }
 
   public ColumnResponseDto updateColumn(Long columnId, ColumnRequestDto columnRequestDto, String username) {
@@ -129,5 +117,10 @@ public class ColumnService {
 
   private boolean hasAccessToBoard(User user, Board board) {
     return user.getUserRole() == UserRole.MANAGER;
+  }
+
+  private Board findBoard(Long boardId) {
+    return boardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
   }
 }
