@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class ColumnService {
   private final BoardRepository boardRepository;
   private final UserRepository userRepository;
 
+  @Transactional
   public void createColumn(Long boardId, ColumnRequestDto columnRequestDto, User user) {
     Board board = findBoard(boardId);
 
@@ -42,27 +44,19 @@ public class ColumnService {
     columnRepository.save(column);
   }
 
-  public ColumnResponseDto updateColumn(Long columnId, ColumnRequestDto columnRequestDto, String username) {
-    User user = userRepository.findByUserName(username)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    Columns column = columnRepository.findById(columnId)
-        .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
-    Board board = column.getBoard();
+  @Transactional
+  public void updateColumn(Long boardId, Long columnId, ColumnRequestDto columnRequestDto, User user) {
+    Board board = findBoard(boardId);
+    Columns column = findColumn(columnId);
 
     if (!hasAccessToBoard(user, board)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_MANAGER);
     }
 
-    column.updateColumnName(columnRequestDto.getColumnName());
-    Columns updatedColumn = columnRepository.save(column);
-
-    return ColumnResponseDto.builder()
-        .id(updatedColumn.getId())
-        .columnName(updatedColumn.getColumnName())
-        .boardId(updatedColumn.getBoard().getId())
-        .build();
+    column.update(columnRequestDto.getColumnName());
   }
 
+  @Transactional
   public void deleteColumn(Long columnId, String username) {
     User user = userRepository.findByUserName(username)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -77,6 +71,7 @@ public class ColumnService {
     columnRepository.delete(column);
   }
 
+  @Transactional(readOnly = true)
   public List<ColumnResponseDto> getColumns(Long boardId, String username) {
     User user = userRepository.findByUserName(username)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -97,6 +92,7 @@ public class ColumnService {
         .collect(Collectors.toList());
   }
 
+  @Transactional
   public void updateColumnOrder(Long boardId, List<ColumnOrderDto> columnOrderDtos, String username) {
     User user = userRepository.findByUserName(username)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -123,4 +119,10 @@ public class ColumnService {
     return boardRepository.findById(boardId)
         .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
   }
+
+  private Columns findColumn(Long columnId) {
+    return columnRepository.findById(columnId)
+        .orElseThrow(() -> new CustomException(ErrorCode.COLUMN_NOT_FOUND));
+  }
+
 }

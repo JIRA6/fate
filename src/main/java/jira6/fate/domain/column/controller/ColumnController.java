@@ -48,7 +48,7 @@ public class ColumnController {
         @RequestBody ColumnRequestDto columnRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        columnService.updateColumn(columnId, columnRequestDto, userDetails.getUser().getUserName());
+        columnService.updateColumn(boardId, columnId, columnRequestDto, userDetails.getUser());
 
         MessageResponse response = MessageResponse.builder()
             .statusCode(200)

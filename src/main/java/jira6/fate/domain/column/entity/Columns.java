@@ -34,17 +34,11 @@ public class Columns extends Timestamped {
     this.board = board;
   }
 
-  public void update(String columnName, Long columnOrder, Board board) {
+  public void update(String columnName) {
     this.columnName = columnName;
-    this.columnOrder = columnOrder;
-    this.board = board;
-  }
-
-  public void updateColumnName(String columnName) {
-
   }
 
   public void updateColumnOrder(Long columnOrder) {
-
+    this.columnOrder = columnOrder;
   }
 }
