@@ -39,6 +39,16 @@ public class JwtProvider {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
+    public String generateToken(String username, String role, Date expirationDate) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("auth", role)
+                .setExpiration(expirationDate)
+                .setIssuedAt(new Date())
+                .signWith(key, signatureAlgorithm)
+                .compact();
+    }
+
     public String generateAccessToken(String username, String role) {
         Date expirationDate = createExpirationDate(accessTokenExpiration);
 
@@ -102,16 +112,6 @@ public class JwtProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    private String generateToken(String username, String role, Date expirationDate) {
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("auth", role)
-                .setExpiration(expirationDate)
-                .setIssuedAt(new Date())
-                .signWith(key, signatureAlgorithm)
-                .compact();
     }
 
     private Date createExpirationDate(Long ms) {
