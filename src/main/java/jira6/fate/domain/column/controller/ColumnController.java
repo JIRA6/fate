@@ -42,22 +42,29 @@ public class ColumnController {
     }
 
     @PutMapping("/boards/{boardId}/columns/{columnId}")
-    public ResponseEntity<?> updateColumn(@PathVariable Long columnId,
-        @RequestBody ColumnRequestDto columnRequestDto, Principal principal) {
-        try {
-            ColumnResponseDto columnResponseDto = columnService.updateColumn(columnId,
-                columnRequestDto, principal.getName());
-            return ResponseEntity.ok().body(columnResponseDto);
-        } catch (CustomException e) {
-            return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(e.getErrorCode().getMessage());
-        }
+    public ResponseEntity<MessageResponse> updateColumn(
+        @Min(1) @PathVariable Long boardId,
+        @Min(1) @PathVariable Long columnId,
+        @RequestBody ColumnRequestDto columnRequestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        columnService.updateColumn(columnId, columnRequestDto, userDetails.getUser().getUserName());
+
+        MessageResponse response = MessageResponse.builder()
+            .statusCode(200)
+            .message("컬럼 수정 성공")
+            .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/boards/{boardId}/columns/{columnId}")
-    public ResponseEntity<?> deleteColumn(@PathVariable Long columnId, Principal principal) {
+    public ResponseEntity<?> deleteColumn(
+        @PathVariable Long columnId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         try {
-            columnService.deleteColumn(columnId, principal.getName());
+            columnService.deleteColumn(columnId, userDetails.getUser().getUserName());
             return ResponseEntity.ok().build();
         } catch (CustomException e) {
             return ResponseEntity.status(e.getErrorCode().getStatus())
@@ -66,11 +73,13 @@ public class ColumnController {
     }
 
     @GetMapping("/boards/{boardId}/columns")
-    public ResponseEntity<List<ColumnResponseDto>> getColumns(@PathVariable Long boardId,
-        Principal principal) {
+    public ResponseEntity<List<ColumnResponseDto>> getColumns(
+        @PathVariable Long boardId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         try {
             List<ColumnResponseDto> columns = columnService.getColumns(boardId,
-                principal.getName());
+                userDetails.getUser().getUserName());
             return ResponseEntity.ok(columns);
         } catch (CustomException e) {
             return ResponseEntity.status(e.getErrorCode().getStatus()).body(null);
@@ -78,11 +87,14 @@ public class ColumnController {
     }
 
     @PostMapping("/boards/{boardId}/columns/{columnId}/order")
-    public ResponseEntity<?> updateColumnOrder(@PathVariable Long boardId,
-        @PathVariable Long columnId, @RequestBody List<ColumnOrderDto> columnOrderDtos,
-        Principal principal) {
+    public ResponseEntity<?> updateColumnOrder(
+        @PathVariable Long boardId,
+        @PathVariable Long columnId,
+        @RequestBody List<ColumnOrderDto> columnOrderDtos,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         try {
-            columnService.updateColumnOrder(boardId, columnOrderDtos, principal.getName());
+            columnService.updateColumnOrder(boardId, columnOrderDtos, userDetails.getUser().getUserName());
             return ResponseEntity.ok().body("컬럼 순서 이동 성공");
         } catch (CustomException e) {
             return ResponseEntity.status(e.getErrorCode().getStatus())
