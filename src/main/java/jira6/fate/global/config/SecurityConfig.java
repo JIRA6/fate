@@ -59,7 +59,7 @@ public class SecurityConfig {
         http.sessionManagement( (sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests( (authorizeHttpRequests) -> authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/api/users/signup").permitAll()
+                        .requestMatchers("/api/users/signup", "/api/token/refresh").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling( (exceptionHandling) -> {
                     exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint);
