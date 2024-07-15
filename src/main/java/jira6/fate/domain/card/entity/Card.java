@@ -9,13 +9,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDate;
 
+import java.util.List;
 import jira6.fate.domain.board.entity.Team;
 import jira6.fate.domain.column.entity.Columns;
+import jira6.fate.domain.comment.entity.Comment;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.global.entity.Timestamped;
 import lombok.Builder;
@@ -56,6 +59,9 @@ public class Card extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    @OneToMany(mappedBy = "card", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     @Builder
     public Card(String cardTitle, String cardContents, Long cardOrder,

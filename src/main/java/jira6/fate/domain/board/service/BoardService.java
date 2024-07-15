@@ -7,6 +7,7 @@ import jira6.fate.domain.board.dto.BoardResponseDto;
 import jira6.fate.domain.board.entity.Board;
 import jira6.fate.domain.board.entity.Team;
 import jira6.fate.domain.board.repository.BoardRepository;
+import jira6.fate.domain.board.repository.TeamRepository;
 import jira6.fate.domain.user.entity.User;
 import jira6.fate.domain.user.entity.UserRole;
 import jira6.fate.domain.user.repository.UserRepository;
@@ -20,22 +21,30 @@ import org.springframework.stereotype.Service;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-
     private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
 
     public BoardResponseDto createBoard(BoardRequestDto boardRequestDto, Long userId) {
-
         User user = validateUser(userId);
-        validateBoardRequest(boardRequestDto);
+        invalidRequest(boardRequestDto);
         validateManager(user);
+        if (boardRepository.existsByTitle(boardRequestDto.getTitle())) {
+            throw new CustomException(ErrorCode.DUPLICATE_TITLE);
+        }
 
         Board board = Board.builder()
             .title(boardRequestDto.getTitle())
             .intro(boardRequestDto.getIntro())
             .user(user)
             .build();
-
         boardRepository.save(board);
+
+        Team team = Team.builder()
+            .board(board)
+            .user(user)
+            .build();
+        board.getTeams().add(team);
+        teamRepository.save(team);
 
         return BoardResponseDto.builder()
             .board(board)
@@ -48,7 +57,7 @@ public class BoardService {
         Board board = validateBoard(boardId);
         User user = validateUser(userId);
         validateManager(user);
-        validateBoardRequest(boardRequestDto);
+        invalidRequest(boardRequestDto);
 
         board.update(boardRequestDto.getTitle(), boardRequestDto.getIntro());
         boardRepository.save(board);
@@ -73,7 +82,7 @@ public class BoardService {
         return boards.stream()
             .map(board -> BoardResponseDto.builder()
                 .board(board)
-                .includeMembers(false)
+                .includeMembers(true)
                 .build())
             .collect(Collectors.toList());
     }
@@ -86,14 +95,20 @@ public class BoardService {
             .build();
     }
 
-    public void userInvite(Long boardId, Long username, Long userId) {
+    public void userInvite(Long boardId, Long userId, Long inviterId) {
         Board board = validateBoard(boardId);
         User user = validateUser(userId);
         validateManager(user);
+        User inviter = validateUser(inviterId);
+        boolean isAlreadyUser = board.getTeams().stream()
+            .anyMatch(team -> team.getUser().getId().equals(inviterId));
+        if (isAlreadyUser) {
+            throw new CustomException(ErrorCode.USER_ALREADY_TEAM);
+        }
 
         Team team = Team.builder()
             .board(board)
-            .user(user)
+            .user(inviter)
             .build();
 
         board.getTeams().add(team);
@@ -116,7 +131,7 @@ public class BoardService {
         }
     }
 
-    private void validateBoardRequest(BoardRequestDto boardRequestDto) {
+    private void invalidRequest(BoardRequestDto boardRequestDto) {
         if (boardRequestDto.getTitle() == null || boardRequestDto.getTitle().isEmpty() ||
             boardRequestDto.getIntro() == null || boardRequestDto.getIntro().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);

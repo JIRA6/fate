@@ -1,5 +1,7 @@
 package jira6.fate.domain.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jira6.fate.domain.user.dto.UserSignupRequestDto;
 import jira6.fate.domain.user.service.UserService;
@@ -55,6 +57,19 @@ public class UserController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/token/refresh")
+    public ResponseEntity<MessageResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        userService.refreshToken(request, response);
+
+        MessageResponse messageResponse = MessageResponse.builder()
+                .statusCode(200)
+                .message("토큰 재발급 성공")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
 }
