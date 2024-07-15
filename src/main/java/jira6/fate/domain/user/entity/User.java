@@ -25,6 +25,9 @@ public class User extends Timestamped {
     @Column
     private String refreshToken;
 
+    @Column
+    private Long kakaoId;
+
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserStatus userStatus;
@@ -34,11 +37,12 @@ public class User extends Timestamped {
     private UserRole userRole;
 
     @Builder
-    public User(String userName, String password, UserStatus userStatus, UserRole userRole) {
+    public User(String userName, String password, UserStatus userStatus, UserRole userRole, Long kakaoId) {
         this.userName = userName;
         this.password = password;
         this.userStatus = userStatus;
         this.userRole = userRole;
+        this.kakaoId = kakaoId;
     }
 
     public void updateRoleToManager() {
