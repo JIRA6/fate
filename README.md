@@ -37,7 +37,7 @@
 
 ## ⚙ 와이어프레임
 
-![와이어프레임_전체](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임_전체.png)
+![와이어프레임_전체](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임0_전체.png)
 
 <details>
 <summary>와이어프레임_로그인 & 회원가입</summary>
@@ -73,13 +73,13 @@
 
 ### 🔧 API 명세서
 
-![기능담당1](https://github.com/JIRA6/fate/blob/dev/readme_image/담당1_유균한.png)
+![기능담당1](https://github.com/JIRA6/fate/blob/dev/readme_image/담당1_유균한.jpg)
 
-![기능담당2](https://github.com/JIRA6/fate/blob/dev/readme_image/담당2_박태순.png)
+![기능담당2](https://github.com/JIRA6/fate/blob/dev/readme_image/담당2_박태순.jpg)
 
-![기능담당3](https://github.com/JIRA6/fate/blob/dev/readme_image/담당3_장경진.png)
+![기능담당3](https://github.com/JIRA6/fate/blob/dev/readme_image/담당3_장경진.jpg)
 
-![기능담당4](https://github.com/JIRA6/fate/blob/dev/readme_image/담당4_최영주.png)
+![기능담당4](https://github.com/JIRA6/fate/blob/dev/readme_image/담당4_최영주.jpg)
 
 
 <br>
