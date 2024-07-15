@@ -25,3 +25,8 @@ jwt:
   expiration:
     access_token: ${JWT_ACCESS_TOKEN_EXPIRATION}
     refresh_token: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+kakao:
+  rest:
+    api:
+      key: ${KAKAO_REST_API_KEY}
