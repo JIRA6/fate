@@ -88,7 +88,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         MessageResponse messageResponse = MessageResponse.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("로그인 성공")
+                .message(user.getUserRole().toString() + " 로그인 성공")
                 .build();
         SecurityMessageResponse securityMessageResponse = new SecurityMessageResponse();
         securityMessageResponse.sendResponse(response, messageResponse);
