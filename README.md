@@ -1,6 +1,6 @@
 # 프로젝트 소개
 
-![JIRA 로고](https://github.com/JIRA6/fate/blob/dev/readme_image/지라로고.png)
+<img src="https://github.com/JIRA6/fate/blob/dev/readme_image/지라로고.png" alt="JIRA 로고" width="50%">
 
 - 프로젝트 명 : JIRA
 - 소개 : 프로젝트 협업 도구인 JIRA의 주요기능인 칸반 보드 기능 구현
@@ -42,28 +42,28 @@
 <details>
 <summary>와이어프레임_로그인 & 회원가입</summary>
 
-![와이어프레임_로그인 & 회원가입](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임_로그인%20&%20회원가입.png)
+![와이어프레임_로그인 & 회원가입](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임1_로그인%20&%20회원가입.png)
+
+<details>
+<summary>와이어프레임_메인페이지</summary>
+
+![와이어프레임_메인페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임2_메인페이지.png)
+
+</details>
 
 </details>
 
 <details>
 <summary>와이어프레임_보드상세페이지</summary>
 
-![와이어프레임_보드상세페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임_보드상세페이지.png)
-
-</details>
-
-<details>
-<summary>와이어프레임_메인페이지</summary>
-
-![와이어프레임_메인페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임_메인페이지.png)
+![와이어프레임_보드상세페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임3_보드상세페이지.png)
 
 </details>
 
 <details>
 <summary>와이어프레임_카드상세페이지</summary>
 
-![와이어프레임_카드상세페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임_카드상세페이지.png)
+![와이어프레임_카드상세페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임4_카드상세페이지.png)
 
 </details>
 
@@ -73,7 +73,14 @@
 
 ### 🔧 API 명세서
 
-![API 명세서](https://github.com/JIRA6/fate/blob/dev/readme_image/ERD.png)
+![기능담당1](https://github.com/JIRA6/fate/blob/dev/readme_image/담당1_유균한.png)
+
+![기능담당2](https://github.com/JIRA6/fate/blob/dev/readme_image/담당2_박태순.png)
+
+![기능담당3](https://github.com/JIRA6/fate/blob/dev/readme_image/담당3_장경진.png)
+
+![기능담당4](https://github.com/JIRA6/fate/blob/dev/readme_image/담당4_최영주.png)
+
 
 <br>
 
@@ -87,10 +94,10 @@
 
 | 담당자 | 역할 |
 | ------ | ---- |
-| <a href="https://github.com/ysy56"><img src="https://github.com/JIRA6/fate/blob/dev/readme_image/담당4_최영주.jpg" alt="최영주" width="100"/><br><div align="center">최영주</div></a> | - 카드 관리 기능 구현 (생성, 조회, 수정, 삭제) <br> - 카드 이동 기능 구현 <br> - 카드 내부 댓글 기능 구현 (생성, 조회) |
-| <a href="https://github.com/ryurbsgks5114"><img src="https://github.com/JIRA6/fate/blob/dev/readme_image/담당1_유균한.jpg" alt="유균한" width="100"/><br><div align="center">유균한</div></a> | - 사용자 기능 구현 <br> - JWT 기능 구현 <br> - Security 기능 구현 |
-| <a href="https://github.com/marlboro09"><img src="https://github.com/JIRA6/fate/blob/dev/readme_image/담당2_박태순.jpg" alt="박태순" width="100"/><br><div align="center">박태순</div></a> | - 보드 관리 기능 구현 <br> - 보드 초대 기능 구현 |
-| <a href="https://github.com/jinny7"><img src="https://github.com/JIRA6/fate/blob/dev/readme_image/담당3_장경진.jpg" alt="장경진" width="100"/><br><div align="center">장경진</div></a> | - 컬럼 CRUD 기능 구현 <br> - 컬럼 이동 기능 구현 |
+| <a href="https://github.com/ysy56"><img src="https://avatars.githubusercontent.com/u/78634780?v=4" alt="최영주" width="100"/><br><div align="center">최영주</div> </a> | - 카드 관리 기능 구현 (생성, 조회, 수정, 삭제) <br> - 카드 이동 기능 구현 <br> - 카드 내부 댓글 기능 구현 (생성, 조회) |
+| <a href="https://github.com/ryurbsgks5114"><img src="https://avatars.githubusercontent.com/u/165640275?v=4" alt="유균한" width="100"/><br><div align="center">유균한</div> </a> | - 사용자 기능 구현 <br> - JWT 기능 구현 <br> - Security 기능 구현 |
+| <a href="https://github.com/marlboro09"><img src="https://avatars.githubusercontent.com/u/165752968?v=4" alt="박태순" width="100"/><br><div align="center">박태순</div> </a> | - 보드 관리 기능 구현 <br> - 보드 초대 기능 구현 |
+| <a href="https://github.com/jinny7"><img src="https://avatars.githubusercontent.com/u/152242318?v=4" alt="장경진" width="100"/><br><div align="center">장경진</div> </a> | - 컬럼 CRUD 기능 구현 <br> - 컬럼 이동 기능 구현 |
 
 ## Code Convention
 - 인텔리제이 구글 코드 컨벤션 적용
