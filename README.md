@@ -44,12 +44,12 @@
 
 ![와이어프레임_로그인 & 회원가입](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임1_로그인%20&%20회원가입.png)
 
+</details>
+
 <details>
 <summary>와이어프레임_메인페이지</summary>
 
 ![와이어프레임_메인페이지](https://github.com/JIRA6/fate/blob/dev/readme_image/와이어프레임2_메인페이지.png)
-
-</details>
 
 </details>
 
