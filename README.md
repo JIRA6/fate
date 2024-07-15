@@ -107,14 +107,14 @@
 - yml vs properties? → yml
 - 생성자로 결정될 경우 : 어노테이션(빌더) vs 직접 작성 → 빌더이므로 어노테이션 추가
 - naming (controller, service, DB table)
-<br>
+
 > **Controller & Service Method**
 > - getAll - 전체
 > - get - 단건
 > - create - 생성
 > - update - 수정
 > - delete - 삭제
-<br>
+
 > **DB Table**
 > - 소문자, 띄어쓰기는 _로 대체 (@Table(name = “(원래의 이름)_table”)
 
